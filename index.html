@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
+<title>Client English Trainer · PPC / Marketing</title>
+<!-- PWA / iOS Add to Home Screen -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="EN Trainer" />
+<meta name="application-name" content="EN Trainer" />
+<meta name="theme-color" content="#0f1115" />
+<meta name="format-detection" content="telephone=no" />
+<!-- Inline SVG icon for home screen (orange tile with EN) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%230f1115'/><circle cx='90' cy='62' r='10' fill='%23ff7a45'/><text x='90' y='128' font-family='-apple-system,sans-serif' font-size='72' font-weight='800' fill='%23ff7a45' text-anchor='middle'>EN</text></svg>" />
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230f1115'/><text x='50' y='70' font-family='sans-serif' font-size='48' font-weight='800' fill='%23ff7a45' text-anchor='middle'>EN</text></svg>" />
+<!-- Inline manifest as data URL for Android Chrome -->
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22EN%20Trainer%22%2C%22short_name%22%3A%22EN%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f1115%22%2C%22theme_color%22%3A%22%230f1115%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Butf8%2C%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20180%20180%27%3E%3Crect%20width%3D%27180%27%20height%3D%27180%27%20rx%3D%2740%27%20fill%3D%27%230f1115%27%2F%3E%3Ctext%20x%3D%2790%27%20y%3D%27128%27%20font-family%3D%27sans-serif%27%20font-size%3D%2772%27%20font-weight%3D%27800%27%20fill%3D%27%23ff7a45%27%20text-anchor%3D%27middle%27%3EEN%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22180x180%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1115;
+    --panel: #171922;
+    --panel-2: #1f2230;
+    --border: #2a2e3d;
+    --text: #e8eaf2;
+    --muted: #8b90a5;
+    --accent: #ff7a45;
+    --accent-2: #ffb088;
+    --green: #4ade80;
+    --yellow: #fbbf24;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --radius: 12px;
+  }
+  html, body {
+    background: radial-gradient(1200px 800px at 80% -10%, #1a1d2c 0%, var(--bg) 60%) fixed;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+  }
+  /* Sidebar */
+  .sidebar {
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand {
+    font-size: 18px; font-weight: 700; margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .brand .dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 16px var(--accent); }
+  .tagline { color: var(--muted); font-size: 12px; margin-bottom: 20px; }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav button {
+    background: transparent; color: var(--text); border: 0; text-align: left;
+    padding: 9px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 13.5px; display: flex; justify-content: space-between; align-items: center;
+    transition: background .15s ease;
+  }
+  .nav button:hover { background: var(--panel-2); }
+  .nav button.active { background: var(--accent); color: #1a0d05; font-weight: 600; }
+  .nav button .count { font-size: 11px; opacity: .7; }
+  .nav button.active .count { opacity: .8; }
+  .nav-section { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin: 14px 8px 6px; }
+  .progress-card {
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px; margin-bottom: 16px;
+  }
+  .progress-card h4 { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .progress-bar { height: 6px; background: var(--panel); border-radius: 999px; overflow: hidden; margin: 8px 0 6px; }
+  .progress-bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .3s ease; }
+  .progress-stats { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; }
+  .progress-stats b { color: var(--text); }
+
+  /* Main */
+  .main { padding: 28px 36px 80px; max-width: 1100px; }
+  .header {
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 16px;
+    margin-bottom: 22px; flex-wrap: wrap;
+  }
+  h1 { font-size: 26px; font-weight: 700; }
+  h1 .sub { color: var(--muted); font-weight: 400; font-size: 14px; margin-left: 8px; }
+  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .toolbar input, .toolbar select, .toolbar button {
+    background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    padding: 8px 12px; border-radius: 8px; font-size: 13px; outline: none;
+  }
+  .toolbar input { width: 220px; }
+  .toolbar input::placeholder { color: var(--muted); }
+  .toolbar input:focus, .toolbar select:focus { border-color: var(--accent); }
+  .toolbar button { cursor: pointer; transition: background .15s; }
+  .toolbar button:hover { background: var(--panel-2); }
+  .toolbar button.primary { background: var(--accent); color: #1a0d05; border-color: var(--accent); font-weight: 600; }
+  .toolbar button.primary:hover { background: var(--accent-2); }
+
+  .modes { display: flex; gap: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 3px; margin-bottom: 22px; width: fit-content; }
+  .modes button {
+    background: transparent; border: 0; color: var(--muted); padding: 7px 14px;
+    border-radius: 6px; font-size: 13px; cursor: pointer; transition: all .15s;
+  }
+  .modes button.active { background: var(--accent); color: #1a0d05; font-weight: 600; }
+  .modes button:not(.active):hover { color: var(--text); }
+
+  /* Phrase list */
+  .phrase-list { display: grid; gap: 12px; }
+  .phrase {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px; transition: border-color .15s;
+  }
+  .phrase:hover { border-color: var(--accent); }
+  .phrase.learned { opacity: .55; }
+  .phrase-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .phrase-en { font-size: 16px; font-weight: 600; color: var(--text); }
+  .phrase-uk { color: var(--muted); font-size: 14px; margin-bottom: 8px; }
+  .phrase-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .badge { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .badge.b1 { color: var(--green); border-color: var(--green); }
+  .badge.b1plus, .badge.b1\+ { color: var(--yellow); border-color: var(--yellow); }
+  .badge.b2 { color: var(--purple); border-color: var(--purple); }
+  .badge.cat { color: var(--blue); border-color: var(--blue); }
+  .phrase-context { color: var(--muted); font-size: 13px; margin: 8px 0 4px; font-style: italic; }
+  .phrase-example {
+    background: var(--panel-2); border-left: 3px solid var(--accent);
+    padding: 10px 12px; border-radius: 6px; font-size: 13.5px; margin-top: 8px;
+  }
+  .phrase-example b { color: var(--accent-2); }
+  .phrase-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all .15s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn.active { background: var(--green); color: #052e10; border-color: var(--green); }
+  .speak-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--blue);
+    padding: 5px 10px; border-radius: 6px; font-size: 13px; cursor: pointer;
+    transition: all .15s; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .speak-btn:hover { background: rgba(96, 165, 250, .1); border-color: var(--blue); }
+  .speak-btn.speaking { background: var(--blue); color: #04132e; }
+  .voice-controls { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+  .voice-controls select { padding: 4px 8px; font-size: 12px; }
+
+  /* Flashcard mode */
+  .flashcard-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .flashcard {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    width: 100%; max-width: 640px; min-height: 320px;
+    padding: 36px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    cursor: pointer; transition: transform .2s, border-color .15s;
+    text-align: center;
+  }
+  .flashcard:hover { border-color: var(--accent); }
+  .flashcard.flipped { background: linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%); }
+  .flashcard .face-en { font-size: 24px; font-weight: 600; }
+  .flashcard .face-uk { font-size: 20px; color: var(--accent-2); }
+  .flashcard .face-context { color: var(--muted); font-size: 13px; margin-top: 12px; font-style: italic; }
+  .flashcard .face-example { background: var(--bg); padding: 10px 14px; border-radius: 8px; margin-top: 14px; font-size: 13px; max-width: 100%; }
+  .flashcard-controls { display: flex; gap: 10px; }
+  .flashcard-counter { color: var(--muted); font-size: 13px; }
+
+  /* Quiz mode */
+  .quiz-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    max-width: 640px; margin: 0 auto; padding: 28px;
+  }
+  .quiz-prompt-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px; }
+  .quiz-prompt { font-size: 20px; font-weight: 600; margin-bottom: 18px; }
+  .quiz-input {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--text); padding: 12px 14px; border-radius: 8px; font-size: 15px;
+    font-family: inherit;
+  }
+  .quiz-input:focus { border-color: var(--accent); outline: none; }
+  .quiz-feedback { margin-top: 14px; padding: 12px 14px; border-radius: 8px; font-size: 14px; display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct { background: rgba(74, 222, 128, .12); border: 1px solid var(--green); color: var(--green); }
+  .quiz-feedback.incorrect { background: rgba(255, 122, 69, .12); border: 1px solid var(--accent); color: var(--accent-2); }
+  .quiz-feedback .answer { color: var(--text); margin-top: 6px; font-size: 13px; }
+
+  /* Dialogue snippets */
+  .dialogue {
+    background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; margin-bottom: 14px;
+  }
+  .dialogue h3 { font-size: 15px; margin-bottom: 4px; }
+  .dialogue .scenario { color: var(--muted); font-size: 13px; margin-bottom: 12px; font-style: italic; }
+  .dialogue .turn { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; }
+  .dialogue .who {
+    flex-shrink: 0; width: 60px; font-size: 12px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .05em; padding-top: 2px;
+  }
+  .dialogue .who.you { color: var(--accent); }
+  .dialogue .text { color: var(--text); font-size: 14px; }
+  .dialogue .text .hl { background: rgba(255, 122, 69, .15); color: var(--accent-2); padding: 1px 4px; border-radius: 3px; }
+
+  .empty { text-align: center; color: var(--muted); padding: 60px 20px; }
+  .footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 40px; }
+
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    .main { padding: 20px; }
+    .toolbar input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="dot"></span> Client English</div>
+    <div class="tagline">PPC / Marketing · B1 → B2</div>
+
+    <div class="progress-card">
+      <h4>Прогрес</h4>
+      <div class="progress-bar"><div id="progressFill" style="width:0%"></div></div>
+      <div class="progress-stats">
+        <span><b id="learnedCount">0</b> / <span id="totalCount">0</span> вивчено</span>
+        <span id="progressPercent">0%</span>
+      </div>
+    </div>
+
+    <div class="nav-section">Категорії</div>
+    <div class="nav" id="categoryNav"></div>
+
+    <div class="nav-section" style="margin-top: 18px;">Дія</div>
+    <div class="nav">
+      <button onclick="resetProgress()" style="color: var(--accent);">↺ Скинути прогрес</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <h1>Client English Trainer <span class="sub">PPC · Marketing · Creative</span></h1>
+    </div>
+
+    <div class="toolbar">
+      <input id="search" type="text" placeholder="Пошук фраз (en / uk)…" oninput="render()" />
+      <select id="levelFilter" onchange="render()">
+        <option value="">Всі рівні</option>
+        <option value="B1">B1</option>
+        <option value="B1+">B1+</option>
+        <option value="B2">B2</option>
+      </select>
+      <select id="learnedFilter" onchange="render()">
+        <option value="">Всі</option>
+        <option value="unlearned">Тільки невивчені</option>
+        <option value="learned">Тільки вивчені</option>
+      </select>
+      <button onclick="randomPhrase()">🎲 Випадкова фраза</button>
+      <div class="voice-controls" style="margin-left: auto;">
+        <span>🔊</span>
+        <select id="voiceSelect" onchange="state.voiceURI = this.value; localStorage.setItem('voice_uri', this.value);"></select>
+        <select id="rateSelect" onchange="state.speechRate = parseFloat(this.value); localStorage.setItem('voice_rate', this.value);">
+          <option value="0.8">0.8x</option>
+          <option value="0.9">0.9x</option>
+          <option value="1" selected>1x</option>
+          <option value="1.1">1.1x</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modes">
+      <button class="active" onclick="setMode('list', event)">📚 Список</button>
+      <button onclick="setMode('flashcards', event)">🃏 Картки</button>
+      <button onclick="setMode('quiz', event)">✍️ Квіз</button>
+      <button onclick="setMode('dialogues', event)">💬 Діалоги</button>
+    </div>
+
+    <div id="content"></div>
+
+    <div class="footer">
+      Прогрес зберігається у браузері (localStorage). Працює оффлайн.
+    </div>
+  </main>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const PHRASES = [
+  // ====== EMAIL & CHAT OPENERS ======
+  { id: 1, cat: "Openers", lvl: "B1", en: "Hope you're doing well.", uk: "Сподіваюсь, у вас все добре.", ctx: "Класичний відкривач email/повідомлення в понеділок або після паузи", ex: "Hi Sarah, hope you're doing well. Wanted to share an update on the Search campaign…" },
+  { id: 2, cat: "Openers", lvl: "B1", en: "Just a quick note to…", uk: "Просто короткий апдейт щоб…", ctx: "Коли пишеш короткий апдейт, не хочеш забирати багато часу", ex: "Just a quick note to flag that the Merchant Center feed is now approved." },
+  { id: 3, cat: "Openers", lvl: "B1+", en: "Following up on my previous message,", uk: "На продовження мого попереднього повідомлення,", ctx: "Коли клієнт не відповів і треба нагадати без агресії", ex: "Following up on my previous message — did you get a chance to review the keyword list?" },
+  { id: 4, cat: "Openers", lvl: "B1+", en: "Circling back on this.", uk: "Повертаюся до цього питання.", ctx: "Дуже корпоративна фраза для повторного нагадування", ex: "Circling back on this — any thoughts on the new bidding strategy?" },
+  { id: 5, cat: "Openers", lvl: "B2", en: "Touching base regarding…", uk: "Виходжу на зв'язок щодо…", ctx: "Натуральне ділове відкриття, особливо для перевірок-апдейтів", ex: "Hi Mark, touching base regarding the Q2 budget allocation." },
+  { id: 6, cat: "Openers", lvl: "B1", en: "Thanks for getting back to me.", uk: "Дякую що відповіли.", ctx: "Після того як клієнт відповів — тепла ввічливість", ex: "Thanks for getting back to me — really helpful context." },
+  { id: 7, cat: "Openers", lvl: "B1", en: "Wanted to share a quick update.", uk: "Хотіла поділитися коротким оновленням.", ctx: "Перед звітом про прогрес", ex: "Wanted to share a quick update on where we are with the PMax launch." },
+  { id: 8, cat: "Openers", lvl: "B2", en: "I'll keep this brief.", uk: "Буду коротка.", ctx: "Коли поважаєш час клієнта і одразу до суті", ex: "I'll keep this brief — three things came up this week that need your input." },
+
+  // ====== STATUS UPDATES ======
+  { id: 10, cat: "Status updates", lvl: "B1", en: "Here's where we are:", uk: "Ось на якому ми етапі:", ctx: "Перед списком апдейтів — структуроване відкриття", ex: "Here's where we are: keyword research is done, ad copy is in review, launch is scheduled for Monday." },
+  { id: 11, cat: "Status updates", lvl: "B1", en: "Things are moving along nicely.", uk: "Все рухається в хорошому темпі.", ctx: "Загальна позитивна картинка для клієнта", ex: "Things are moving along nicely — we're on track for the Friday launch." },
+  { id: 12, cat: "Status updates", lvl: "B1+", en: "We're on track to wrap up by [date].", uk: "Ми вкладаємось в дедлайн до [дата].", ctx: "Підтвердження що дедлайн реалістичний", ex: "We're on track to wrap up the audit by end of next week." },
+  { id: 13, cat: "Status updates", lvl: "B1+", en: "Currently in the works.", uk: "Зараз в роботі.", ctx: "Коротко описати поточну задачу", ex: "The new ad creatives are currently in the works — should be ready by Thursday." },
+  { id: 14, cat: "Status updates", lvl: "B2", en: "We've made significant progress on…", uk: "Ми досягли значного прогресу в…", ctx: "Більш формально — для звіту або щотижневого summary", ex: "We've made significant progress on restructuring the Search campaigns." },
+  { id: 15, cat: "Status updates", lvl: "B1", en: "It's pretty much ready.", uk: "Вже майже готово.", ctx: "Неформально, у чаті — щоб клієнт знав що чекати недовго", ex: "The dashboard is pretty much ready — just doing final QA." },
+  { id: 16, cat: "Status updates", lvl: "B1+", en: "We hit a small snag with…", uk: "Ми трохи затрималися на…", ctx: "Чесно сказати про невелику проблему без драми", ex: "We hit a small snag with the feed approval, but it's resolved now." },
+  { id: 17, cat: "Status updates", lvl: "B2", en: "We're putting the finishing touches on it.", uk: "Доводимо до досконалості.", ctx: "На фінальній стадії, лишилися деталі", ex: "We're putting the finishing touches on the Q2 report — sending it over today." },
+
+  // ====== ASKING QUESTIONS / CLARIFICATION ======
+  { id: 20, cat: "Clarification", lvl: "B1", en: "Could you clarify what you mean by…?", uk: "Можеш уточнити що ти маєш на увазі під…?", ctx: "Ввічливо просити деталей коли щось незрозуміло", ex: "Could you clarify what you mean by 'aggressive scaling' — are we talking 50% increase or 2x?" },
+  { id: 21, cat: "Clarification", lvl: "B1", en: "Just to make sure I've got this right,", uk: "Просто щоб переконатися що я зрозуміла правильно,", ctx: "Перефразувати щоб підтвердити розуміння", ex: "Just to make sure I've got this right — you'd like the campaign paused, not deleted?" },
+  { id: 22, cat: "Clarification", lvl: "B1+", en: "Could you walk me through it?", uk: "Можеш пояснити покроково?", ctx: "Просити детальніше пояснення процесу", ex: "Could you walk me through how you want the lead routing to work?" },
+  { id: 23, cat: "Clarification", lvl: "B1+", en: "Just so we're on the same page,", uk: "Просто щоб ми були на одній хвилі,", ctx: "Перед уточненням важливої деталі", ex: "Just so we're on the same page — the deliverable is the audit doc, not the live optimisation, right?" },
+  { id: 24, cat: "Clarification", lvl: "B2", en: "I want to make sure I understand correctly before moving forward.", uk: "Хочу переконатися що правильно розумію перед тим як рухатись далі.", ctx: "Дуже професійно — для важливих рішень", ex: "I want to make sure I understand correctly before moving forward — should we apply this to all accounts or just the AU one?" },
+  { id: 25, cat: "Clarification", lvl: "B1", en: "Quick question —", uk: "Коротке питання —", ctx: "Casual початок питання у чаті", ex: "Quick question — do you want me to include branded keywords in the report?" },
+  { id: 26, cat: "Clarification", lvl: "B1+", en: "Bear with me for a second —", uk: "Хвилинку —", ctx: "Перед уточненням, коли ще думаєш", ex: "Bear with me for a second — let me check the historical data on that." },
+  { id: 27, cat: "Clarification", lvl: "B2", en: "Could you give me a bit more context on…?", uk: "Можеш дати трохи більше контексту щодо…?", ctx: "Коли потрібен ширший фон щоб дати правильну відповідь", ex: "Could you give me a bit more context on how this fits into the broader Q2 strategy?" },
+
+  // ====== EXPECTATIONS & DEADLINES ======
+  { id: 30, cat: "Expectations", lvl: "B1", en: "I'll have it to you by [day/time].", uk: "Я надішлю вам це до [день/час].", ctx: "Чітке зобов'язання по дедлайну", ex: "I'll have the keyword list to you by Thursday EOD." },
+  { id: 31, cat: "Expectations", lvl: "B1+", en: "Let me get back to you on that by [time].", uk: "Я повернусь до тебе по цьому до [час].", ctx: "Коли треба час щоб подумати/перевірити", ex: "Let me get back to you on that by tomorrow morning — I want to double-check the data first." },
+  { id: 32, cat: "Expectations", lvl: "B1+", en: "Realistically, this will take about [time].", uk: "Реалістично, це займе близько [часу].", ctx: "Чесна оцінка — без overcommitting", ex: "Realistically, this will take about 3–4 days, factoring in QA." },
+  { id: 33, cat: "Expectations", lvl: "B2", en: "We should aim for [date] as a soft deadline.", uk: "Орієнтуймося на [дата] як на гнучкий дедлайн.", ctx: "Soft deadline = не критичний, але бажаний", ex: "We should aim for the 25th as a soft deadline — that gives us buffer before the campaign launch." },
+  { id: 34, cat: "Expectations", lvl: "B1", en: "Just to manage expectations,", uk: "Просто щоб одразу визначити очікування,", ctx: "Перед чимось, що може бути не таким як клієнт думає", ex: "Just to manage expectations — first results from PMax usually show up after 2–3 weeks." },
+  { id: 35, cat: "Expectations", lvl: "B2", en: "I'd rather under-promise and over-deliver.", uk: "Краще обіцяти менше і робити більше.", ctx: "Філософія — пояснити чому даєш консервативну оцінку", ex: "I'd rather under-promise and over-deliver, so let's say end of week, but I'll try for Wednesday." },
+  { id: 36, cat: "Expectations", lvl: "B1+", en: "Is there a hard deadline I should be aware of?", uk: "Чи є жорсткий дедлайн про який мені треба знати?", ctx: "Запитати чи є зовнішній тиск (запуск, презентація і т.д.)", ex: "Is there a hard deadline I should be aware of, or do we have flexibility?" },
+  { id: 37, cat: "Expectations", lvl: "B1", en: "EOD = end of day · EOW = end of week · EOB = end of business", uk: "EOD = до кінця дня · EOW = до кінця тижня · EOB = до кінця робочого дня", ctx: "Скорочення які постійно використовують в дедлайнах", ex: "Need this by EOB Friday at the latest." },
+
+  // ====== PERFORMANCE & DATA TALK ======
+  { id: 40, cat: "Performance", lvl: "B1", en: "The numbers are looking strong.", uk: "Цифри виглядають сильно.", ctx: "Позитивний апдейт — кампанія працює", ex: "The numbers are looking strong this week — CTR is up 18% MoM." },
+  { id: 41, cat: "Performance", lvl: "B1+", en: "Performance is trending in the right direction.", uk: "Показники рухаються в правильному напрямку.", ctx: "Обережний оптимізм — поки рано робити висновки", ex: "Performance is trending in the right direction, but I'd like another week of data before scaling." },
+  { id: 42, cat: "Performance", lvl: "B2", en: "We're seeing diminishing returns on…", uk: "Бачимо спадаючу віддачу від…", ctx: "Економічний термін — більше витрат не дає більше результату", ex: "We're seeing diminishing returns on broad match — CPCs went up 30% but conversions stayed flat." },
+  { id: 43, cat: "Performance", lvl: "B1+", en: "The campaign is underperforming.", uk: "Кампанія працює нижче очікувань.", ctx: "М'яке формулювання поганих результатів", ex: "The Display campaign is underperforming relative to Search — I'd recommend reallocating budget." },
+  { id: 44, cat: "Performance", lvl: "B2", en: "ROAS dropped from X to Y week over week.", uk: "ROAS впав з X до Y тиждень до тижня.", ctx: "Точна метрика — клієнти люблять конкретику", ex: "ROAS dropped from 4.2 to 2.8 week over week, mostly driven by the new product feed." },
+  { id: 45, cat: "Performance", lvl: "B1", en: "Conversions are flat.", uk: "Конверсії не ростуть.", ctx: "Без руху ні вгору ні вниз", ex: "Conversions are flat for the third week in a row — time to test new creatives." },
+  { id: 46, cat: "Performance", lvl: "B2", en: "We're outpacing our targets by [%].", uk: "Перевищуємо наші цілі на [%].", ctx: "Дуже добре — кампанія перевиконує план", ex: "We're outpacing our CPA target by 22% — solid month." },
+  { id: 47, cat: "Performance", lvl: "B1+", en: "There's room for improvement on…", uk: "Є простір для покращення в…", ctx: "Конструктивна критика — щось можна підтягнути", ex: "There's room for improvement on the landing page conversion rate — currently sitting at 1.8%." },
+  { id: 48, cat: "Performance", lvl: "B2", en: "The data tells a different story.", uk: "Дані говорять інше.", ctx: "Коли інтуїція клієнта суперечить цифрам — треба показати дані", ex: "I know it feels like Display is helping, but the data tells a different story — assisted conversions are minimal." },
+  { id: 49, cat: "Performance", lvl: "B1+", en: "Let me pull the numbers and get back to you.", uk: "Дай мені витягнути цифри і повернуся з відповіддю.", ctx: "Коли клієнт питає метрики на ходу, а ти не пам'ятаєш точно", ex: "Good question — let me pull the numbers and get back to you in an hour." },
+
+  // ====== RECOMMENDATIONS ======
+  { id: 50, cat: "Recommendations", lvl: "B1", en: "I'd recommend we…", uk: "Я б рекомендувала нам…", ctx: "Класичний м'який спосіб запропонувати дію", ex: "I'd recommend we pause the broad match keywords until we cleanup the negative list." },
+  { id: 51, cat: "Recommendations", lvl: "B1+", en: "It might be worth exploring…", uk: "Можливо варто розглянути…", ctx: "Дуже м'яка пропозиція — без тиску на клієнта", ex: "It might be worth exploring PMax for the seasonal push." },
+  { id: 52, cat: "Recommendations", lvl: "B2", en: "My suggestion would be to…", uk: "Моя пропозиція — це…", ctx: "Більш формально, для письмових рекомендацій", ex: "My suggestion would be to consolidate the three Search campaigns into one structured by product type." },
+  { id: 53, cat: "Recommendations", lvl: "B1+", en: "Have you considered…?", uk: "Ти розглядав…?", ctx: "Запропонувати ідею у формі питання — менш прямолінійно", ex: "Have you considered shifting some of the Display budget into YouTube?" },
+  { id: 54, cat: "Recommendations", lvl: "B2", en: "Based on what we're seeing, I'd lean towards…", uk: "Виходячи з того, що ми бачимо, я б схилялася до…", ctx: "Аргументована рекомендація на основі даних", ex: "Based on what we're seeing in the search term report, I'd lean towards tighter match types." },
+  { id: 55, cat: "Recommendations", lvl: "B1", en: "Quick win:", uk: "Швидкий виграш:", ctx: "Перед маленькою зміною яка дасть швидкий результат", ex: "Quick win: adding 'free' as a negative keyword would cut about 12% of wasted spend." },
+  { id: 56, cat: "Recommendations", lvl: "B2", en: "If I were in your shoes, I'd…", uk: "Якби я була на твоєму місці, я б…", ctx: "Особиста, дружня рекомендація", ex: "If I were in your shoes, I'd hold off on scaling until we've nailed the conversion tracking." },
+  { id: 57, cat: "Recommendations", lvl: "B1+", en: "What I'd propose is…", uk: "Що я пропоную — це…", ctx: "Структурно представити свій план", ex: "What I'd propose is a 2-week test on PMax with a 15% budget allocation, then we review." },
+
+  // ====== POLITE PUSHBACK ======
+  { id: 60, cat: "Pushback", lvl: "B1+", en: "I see where you're coming from, but…", uk: "Я розумію твою позицію, але…", ctx: "Визнати точку зору клієнта перед тим як заперечити", ex: "I see where you're coming from, but cutting Search budget right now would hurt our peak season performance." },
+  { id: 61, cat: "Pushback", lvl: "B2", en: "I'd push back gently on that.", uk: "Я б ввічливо з цим не погодилася.", ctx: "Чесно — але м'яко — заперечити", ex: "I'd push back gently on that — historically that strategy hasn't worked for accounts at this stage." },
+  { id: 62, cat: "Pushback", lvl: "B1+", en: "That could work, but I have a few concerns.", uk: "Це може спрацювати, але є кілька застережень.", ctx: "Не повне заперечення — а попередження про ризики", ex: "That could work, but I have a few concerns — namely, the small sample size we'd be testing on." },
+  { id: 63, cat: "Pushback", lvl: "B2", en: "I'd hesitate to do that because…", uk: "Я б не поспішала з цим, тому що…", ctx: "Виразити сумнів з аргументацією", ex: "I'd hesitate to do that because we don't yet have enough conversion data to optimise tCPA." },
+  { id: 64, cat: "Pushback", lvl: "B1+", en: "On the flip side,", uk: "З іншого боку,", ctx: "Показати протилежну точку зору", ex: "On the flip side, scaling too fast could blow out the CPA before we know what's driving conversions." },
+  { id: 65, cat: "Pushback", lvl: "B2", en: "Just playing devil's advocate here —", uk: "Просто граю адвоката диявола —", ctx: "Перед тим як висловити контраргумент щоб не звучати як заперечник", ex: "Just playing devil's advocate here — what if the increase in conversions is purely seasonal?" },
+  { id: 66, cat: "Pushback", lvl: "B1+", en: "I hear you, and at the same time…", uk: "Я тебе чую, і водночас…", ctx: "Емпатичне заперечення — підтвердити і додати свою думку", ex: "I hear you on speed, and at the same time, we'd be skipping the QA step that prevents tracking issues." },
+  { id: 67, cat: "Pushback", lvl: "B2", en: "I want to flag a potential risk here.", uk: "Хочу попередити про потенційний ризик.", ctx: "Формально звернути увагу на проблему", ex: "I want to flag a potential risk here — running PMax and Shopping in parallel often causes cannibalisation." },
+
+  // ====== BAD NEWS / DELAYS ======
+  { id: 70, cat: "Bad news", lvl: "B1+", en: "I wanted to give you a heads-up that…", uk: "Хотіла попередити що…", ctx: "Перед тим як повідомити про проблему — неагресивно", ex: "I wanted to give you a heads-up that the launch will likely slip to next Tuesday." },
+  { id: 71, cat: "Bad news", lvl: "B1", en: "Unfortunately, we ran into an issue with…", uk: "На жаль, ми зіткнулись з проблемою з…", ctx: "Почати повідомлення про проблему", ex: "Unfortunately, we ran into an issue with the conversion tracking — events aren't firing on mobile." },
+  { id: 72, cat: "Bad news", lvl: "B2", en: "There's been a slight setback.", uk: "Є невелика затримка/відкат.", ctx: "М'яке слово 'setback' — не катастрофа", ex: "There's been a slight setback with the feed approval — Google's flagging 12 products." },
+  { id: 73, cat: "Bad news", lvl: "B1+", en: "We're going to need a little more time on this.", uk: "Нам знадобиться трохи більше часу.", ctx: "Дипломатично попросити продовження дедлайну", ex: "We're going to need a little more time on this — the dev team flagged a tracking conflict." },
+  { id: 74, cat: "Bad news", lvl: "B2", en: "I want to be upfront with you —", uk: "Хочу бути відкритою з тобою —", ctx: "Перед чесним поганим повідомленням", ex: "I want to be upfront with you — the Q1 results came in below target." },
+  { id: 75, cat: "Bad news", lvl: "B1+", en: "Here's what happened, and here's how we're fixing it.", uk: "Ось що сталося, і ось як ми це виправляємо.", ctx: "Чудова структура для звіту про інцидент", ex: "Here's what happened, and here's how we're fixing it — short version: tag misfired, we caught it within 4 hours." },
+  { id: 76, cat: "Bad news", lvl: "B2", en: "I take full responsibility for this.", uk: "Я беру повну відповідальність за це.", ctx: "Чесно визнати помилку — будує довіру", ex: "I take full responsibility for this — the QA step was rushed and we missed the bug." },
+  { id: 77, cat: "Bad news", lvl: "B1+", en: "We're already on it.", uk: "Ми вже працюємо над цим.", ctx: "Заспокоїти клієнта що проблему вже вирішують", ex: "We're already on it — should be resolved by EOD today." },
+
+  // ====== FOLLOWING UP ======
+  { id: 80, cat: "Follow-ups", lvl: "B1", en: "Just following up on…", uk: "Просто повертаюсь до…", ctx: "Найпростіший follow-up", ex: "Just following up on the keyword list I sent over Tuesday — any feedback?" },
+  { id: 81, cat: "Follow-ups", lvl: "B1+", en: "Bumping this to the top of your inbox.", uk: "Піднімаю це нагору у вашій скриньці.", ctx: "Свіжий, дружній follow-up", ex: "Bumping this to the top of your inbox — let me know your thoughts when you get a sec." },
+  { id: 82, cat: "Follow-ups", lvl: "B1+", en: "No rush, just want to make sure this didn't slip through.", uk: "Не поспішаю, просто хочу переконатися що це не загубилось.", ctx: "Дуже ввічливо нагадати без тиску", ex: "No rush, just want to make sure this didn't slip through — happy to chat any time this week." },
+  { id: 83, cat: "Follow-ups", lvl: "B2", en: "Whenever you get a chance to look at this, I'd love your input.", uk: "Коли матимеш можливість поглянути — буду рада твоєму фідбеку.", ctx: "Тепле нагадування без тиску", ex: "Whenever you get a chance to look at this, I'd love your input on the proposed structure." },
+  { id: 84, cat: "Follow-ups", lvl: "B1+", en: "Wanted to make sure my last email landed.", uk: "Хотіла переконатись що мій лист дійшов.", ctx: "Делікатно припустити що могла бути технічна проблема", ex: "Wanted to make sure my last email landed — sometimes things get filtered." },
+  { id: 85, cat: "Follow-ups", lvl: "B2", en: "Looping back on this thread.", uk: "Повертаюся до цієї гілки.", ctx: "Дуже ділова фраза для відновлення розмови", ex: "Looping back on this thread — any update from the dev team on the pixel install?" },
+
+  // ====== CLOSINGS & SIGN-OFFS ======
+  { id: 90, cat: "Closings", lvl: "B1", en: "Let me know if you need anything else.", uk: "Дай знати якщо потрібно ще щось.", ctx: "Тепле закінчення листа", ex: "Sending the report over now — let me know if you need anything else." },
+  { id: 91, cat: "Closings", lvl: "B1", en: "Talk soon.", uk: "Скоро поговоримо.", ctx: "Дружнє неформальне закінчення", ex: "All looks good from my side. Talk soon!" },
+  { id: 92, cat: "Closings", lvl: "B1+", en: "Looking forward to your thoughts.", uk: "Чекаю на твої думки.", ctx: "Запрошення дати фідбек — без тиску", ex: "Attached the proposal — looking forward to your thoughts." },
+  { id: 93, cat: "Closings", lvl: "B1+", en: "Happy to jump on a quick call if it helps.", uk: "Можемо швидко скочити на дзвінок якщо це допоможе.", ctx: "Запропонувати дзвінок коли тема складна", ex: "Lots of moving parts here — happy to jump on a quick call if it helps." },
+  { id: 94, cat: "Closings", lvl: "B2", en: "I'll leave it with you for now.", uk: "Залишаю це на твій розсуд.", ctx: "Передати рішення клієнту і відійти", ex: "I've laid out the options — I'll leave it with you for now and we can discuss Wednesday." },
+  { id: 95, cat: "Closings", lvl: "B1", en: "Best, [name]", uk: "Best, [імʼя] (стандартне закінчення)", ctx: "Універсальний sign-off для більшості листів", ex: "Best, Tetiana" },
+  { id: 96, cat: "Closings", lvl: "B1+", en: "Cheers,", uk: "Cheers, (більш дружнє)", ctx: "Тепліше ніж 'Best' — для UK/AU клієнтів особливо", ex: "Cheers, Tetiana" },
+  { id: 97, cat: "Closings", lvl: "B2", en: "Appreciate your patience on this.", uk: "Дякую за терпіння в цьому питанні.", ctx: "Закінчення коли була затримка/складна тема", ex: "Hope this clears it up. Appreciate your patience on this." },
+
+  // ====== MEETING PHRASES ======
+  { id: 100, cat: "Meetings", lvl: "B1", en: "Can everyone hear me okay?", uk: "Усі мене чути нормально?", ctx: "Перевірка звуку на початку дзвінка", ex: "Hi everyone — can everyone hear me okay?" },
+  { id: 101, cat: "Meetings", lvl: "B1+", en: "Should we kick things off?", uk: "Можемо починати?", ctx: "Природній спосіб почати мітинг", ex: "Looks like we're all here — should we kick things off?" },
+  { id: 102, cat: "Meetings", lvl: "B1", en: "Let me share my screen.", uk: "Я зараз поділюсь екраном.", ctx: "Перед демонстрацією — стандартна фраза", ex: "Let me share my screen so you can see the dashboard." },
+  { id: 103, cat: "Meetings", lvl: "B1+", en: "Sorry, I think you're on mute.", uk: "Вибач, здається у тебе вимкнений мікрофон.", ctx: "Найкорисніша фраза в Zoom-епоху", ex: "Sorry Mark, I think you're on mute — we can't hear you." },
+  { id: 104, cat: "Meetings", lvl: "B1+", en: "Could we park that and come back to it?", uk: "Можемо відкласти це і повернутись пізніше?", ctx: "Не хочеш відволікатись — pinkmark тему на потім", ex: "Great point — could we park that and come back to it after we cover the Q2 plan?" },
+  { id: 105, cat: "Meetings", lvl: "B2", en: "Just to circle back to your earlier point —", uk: "Просто повертаючись до твого попереднього пункту —", ctx: "Повернутися до раніше згаданої теми", ex: "Just to circle back to your earlier point on PMax — I do think it's worth testing." },
+  { id: 106, cat: "Meetings", lvl: "B1+", en: "I want to make sure we're capturing this in action items.", uk: "Хочу переконатися що ми фіксуємо це в action items.", ctx: "Перетворити обговорення на конкретні задачі", ex: "I want to make sure we're capturing this in action items — Sarah, you'll own the feed audit, right?" },
+  { id: 107, cat: "Meetings", lvl: "B2", en: "Let's wrap up with action items and next steps.", uk: "Давайте завершимо з action items та наступними кроками.", ctx: "Структурне закінчення мітингу", ex: "We're at time — let's wrap up with action items and next steps." },
+  { id: 108, cat: "Meetings", lvl: "B1+", en: "Mind if I jump in here?", uk: "Не проти якщо я долучусь?", ctx: "Ввічливо взяти слово", ex: "Mind if I jump in here? I have some context that might help." },
+  { id: 109, cat: "Meetings", lvl: "B1+", en: "Sorry, didn't mean to talk over you.", uk: "Вибач, не хотіла перебивати.", ctx: "Коли випадково перебили", ex: "Sorry Mark, didn't mean to talk over you — please go on." },
+  { id: 110, cat: "Meetings", lvl: "B2", en: "Just to play it back —", uk: "Просто щоб переказати —", ctx: "Підсумувати щоб переконатися що зрозуміла", ex: "Just to play it back — we're scaling Search by 20%, pausing Display, and revisiting in two weeks." },
+
+  // ====== EMAIL FORMAL PHRASES ======
+  { id: 120, cat: "Email formal", lvl: "B1+", en: "Please find attached…", uk: "Додаю в прикріпленні…", ctx: "Класична фраза при відправці файлів", ex: "Please find attached the keyword research document for your review." },
+  { id: 121, cat: "Email formal", lvl: "B1+", en: "Apologies for the delayed response.", uk: "Перепрошую за затриману відповідь.", ctx: "Коли довго не відповідала", ex: "Apologies for the delayed response — was tied up with the launch." },
+  { id: 122, cat: "Email formal", lvl: "B2", en: "Thanks for flagging this.", uk: "Дякую що звернув увагу.", ctx: "Коли клієнт повідомив про проблему/деталь", ex: "Thanks for flagging this — looking into it now." },
+  { id: 123, cat: "Email formal", lvl: "B1+", en: "Please let me know if this works for you.", uk: "Дайте знати якщо це підходить.", ctx: "Після пропозиції — час, рішення тощо", ex: "I've blocked off Thursday at 3pm — please let me know if this works for you." },
+  { id: 124, cat: "Email formal", lvl: "B2", en: "I'll defer to your judgment on this.", uk: "Покладаюся на твоє рішення в цьому питанні.", ctx: "Передати остаточний вибір клієнту", ex: "Both options have trade-offs — I'll defer to your judgment on this." },
+  { id: 125, cat: "Email formal", lvl: "B1+", en: "For your reference,", uk: "Для довідки,", ctx: "Перед прикріпленням контекстної інфи", ex: "For your reference, here's the link to the previous month's report." },
+  { id: 126, cat: "Email formal", lvl: "B2", en: "I'll loop in [name] for visibility.", uk: "Додаю [ім'я] в копію для прозорості.", ctx: "Включити іншу людину в обговорення", ex: "I'll loop in our dev lead Sarah for visibility on the tracking issue." },
+
+  // ====== APOLOGIES & ACKNOWLEDGMENTS ======
+  { id: 130, cat: "Apologies", lvl: "B1", en: "My apologies for the confusion.", uk: "Перепрошую за плутанину.", ctx: "Коли власне повідомлення було незрозумілим", ex: "My apologies for the confusion — let me clarify what I meant." },
+  { id: 131, cat: "Apologies", lvl: "B1+", en: "That's on me.", uk: "Це моя помилка.", ctx: "Коротке і чесне визнання помилки", ex: "Looks like the negative keyword wasn't applied — that's on me, fixing it now." },
+  { id: 132, cat: "Apologies", lvl: "B2", en: "I should have caught that earlier.", uk: "Мала помітити це раніше.", ctx: "Самокритично визнати недогляд", ex: "I should have caught that earlier — sorry it slipped through QA." },
+  { id: 133, cat: "Apologies", lvl: "B1+", en: "Thanks for your patience.", uk: "Дякую за терпіння.", ctx: "Після того як клієнт чекав", ex: "Got the report ready — thanks for your patience." },
+  { id: 134, cat: "Apologies", lvl: "B2", en: "I appreciate you bringing this to my attention.", uk: "Дякую що звернув на це мою увагу.", ctx: "Формальне визнання що щось важливе помітили", ex: "I appreciate you bringing this to my attention — investigating now." },
+  { id: 135, cat: "Apologies", lvl: "B1+", en: "Won't happen again.", uk: "Більше не повториться.", ctx: "Коротке зобов'язання після помилки", ex: "Tightening up the QA process — won't happen again." },
+
+  // ====== PPC / MARKETING TERMINOLOGY ======
+  { id: 140, cat: "PPC vocab", lvl: "B1", en: "Bidding strategy", uk: "Стратегія ставок", ctx: "Як алгоритм виставляє ставки (tCPA, tROAS, Max Conversions)", ex: "We need to switch the bidding strategy to tROAS once we hit 30 conversions." },
+  { id: 141, cat: "PPC vocab", lvl: "B1+", en: "Cannibalisation", uk: "Канібалізація трафіку", ctx: "Коли одна кампанія краде покази/кліки в іншої", ex: "There's some cannibalisation between Brand and PMax — let's add brand exclusions." },
+  { id: 142, cat: "PPC vocab", lvl: "B1", en: "Match types (broad / phrase / exact)", uk: "Типи відповідності ключових слів", ctx: "Як близько запит має співпадати з ключем", ex: "Let's pull broad match into phrase and tighten the search terms." },
+  { id: 143, cat: "PPC vocab", lvl: "B1+", en: "Negative keywords", uk: "Мінус-слова", ctx: "Слова за якими ти НЕ хочеш показуватись", ex: "I'm building out a negative keyword list — already at 200 added this week." },
+  { id: 144, cat: "PPC vocab", lvl: "B2", en: "Search Impression Share (SIS) / Lost IS", uk: "Частка показів у пошуку / Втрачена IS", ctx: "% показів які кампанія отримує проти всіх можливих", ex: "We're losing 40% IS to budget — there's room to scale." },
+  { id: 145, cat: "PPC vocab", lvl: "B1+", en: "Quality Score", uk: "Показник якості", ctx: "Оцінка релевантності ключа/реклами/LP від Google", ex: "Quality Score on the main keyword dropped to 5 — we need new ad copy." },
+  { id: 146, cat: "PPC vocab", lvl: "B1", en: "Click-through rate (CTR)", uk: "Коефіцієнт кліків", ctx: "Кліки / Покази", ex: "CTR is up 14% week over week — the new headlines are working." },
+  { id: 147, cat: "PPC vocab", lvl: "B2", en: "Assisted conversions", uk: "Допоміжні конверсії", ctx: "Конверсії де канал брав участь у воронці але не був останнім", ex: "Display has weak last-click but high assisted conversions — don't kill it yet." },
+  { id: 148, cat: "PPC vocab", lvl: "B1+", en: "Account audit", uk: "Аудит акаунту", ctx: "Структурний аналіз акаунту на проблеми/можливості", ex: "I'll run a full account audit before we propose the new structure." },
+  { id: 149, cat: "PPC vocab", lvl: "B1+", en: "Feed (Merchant Center)", uk: "Фід продуктів", ctx: "Файл з продуктами для Shopping/PMax кампаній", ex: "We need to clean up the feed — 12 products are disapproved." },
+  { id: 150, cat: "PPC vocab", lvl: "B2", en: "Incrementality", uk: "Інкрементальність", ctx: "Чи дійсно канал генерує додаткові продажі", ex: "We should run an incrementality test on Brand — half the conversions might be organic anyway." },
+  { id: 151, cat: "PPC vocab", lvl: "B1+", en: "A/B test (split test)", uk: "A/B тест", ctx: "Порівняння двох варіантів", ex: "Let's A/B test the two landing page variants for two weeks." },
+
+  // ====== HEDGING & SOFTENERS ======
+  { id: 160, cat: "Hedging", lvl: "B1+", en: "It seems like…", uk: "Здається, що…", ctx: "Не категорично — припущення на основі даних", ex: "It seems like the new creative is driving most of the lift." },
+  { id: 161, cat: "Hedging", lvl: "B1+", en: "Based on what I'm seeing,", uk: "Виходячи з того, що я бачу,", ctx: "Прив'язка висновку до даних — професійно", ex: "Based on what I'm seeing, the issue is the audience overlap, not the creative." },
+  { id: 162, cat: "Hedging", lvl: "B2", en: "I'd say it's likely that…", uk: "Я б сказала, що скоріше за все…", ctx: "Висловити ймовірне без 100% впевненості", ex: "I'd say it's likely that the dip is seasonal, but let's monitor for another week." },
+  { id: 163, cat: "Hedging", lvl: "B1+", en: "Off the top of my head,", uk: "Зходу/без перевірки,", ctx: "Перед швидкою відповіддю без перевірки даних", ex: "Off the top of my head, CPA was around $42, but let me confirm." },
+  { id: 164, cat: "Hedging", lvl: "B2", en: "I could be wrong, but…", uk: "Можу помилятись, але…", ctx: "Скромно ввести свою думку", ex: "I could be wrong, but I think the tracking pixel was changed last sprint." },
+  { id: 165, cat: "Hedging", lvl: "B1+", en: "From what I can tell,", uk: "Наскільки я можу судити,", ctx: "Висновок з обмеженою інформацією", ex: "From what I can tell, the drop started right after the feed update." },
+
+  // ====== CONNECTORS / DISCOURSE MARKERS ======
+  { id: 170, cat: "Connectors", lvl: "B1", en: "That said,", uk: "Тим не менше,", ctx: "Перехід до контрастної думки після пояснення", ex: "Display ROAS is low. That said, it's pulling its weight on assisted conversions." },
+  { id: 171, cat: "Connectors", lvl: "B1+", en: "Having said that,", uk: "Сказавши це,", ctx: "Те ж саме — введення нюансу/контрасту", ex: "PMax is performing well. Having said that, we should keep an eye on brand cannibalisation." },
+  { id: 172, cat: "Connectors", lvl: "B1+", en: "On top of that,", uk: "Окрім того,", ctx: "Додавання до попереднього аргументу", ex: "CTR is up. On top of that, CPC dropped by 8 cents — strong signal." },
+  { id: 173, cat: "Connectors", lvl: "B1", en: "In other words,", uk: "Іншими словами,", ctx: "Перефразувати щоб було зрозуміло", ex: "Conversions are flat but CPA is down. In other words, we're getting the same volume cheaper." },
+  { id: 174, cat: "Connectors", lvl: "B1+", en: "Long story short,", uk: "Якщо коротко,", ctx: "Перейти до головного без деталей", ex: "Long story short — the feed is fixed and Shopping is back live." },
+  { id: 175, cat: "Connectors", lvl: "B2", en: "Going forward,", uk: "Надалі,", ctx: "Перейти до планів на майбутнє", ex: "Going forward, let's review performance every Monday and reallocate accordingly." },
+  { id: 176, cat: "Connectors", lvl: "B2", en: "All things considered,", uk: "Враховуючи все,", ctx: "Підсумок з врахуванням різних факторів", ex: "All things considered, the launch went smoothly despite the feed delay." },
+  { id: 177, cat: "Connectors", lvl: "B1+", en: "For what it's worth,", uk: "Для контексту, / Як на мене,", ctx: "Перед своєю думкою — скромно", ex: "For what it's worth, similar accounts saw a 2-week ramp-up before PMax stabilised." },
+  { id: 178, cat: "Connectors", lvl: "B1+", en: "By the same token,", uk: "Тією ж логікою,", ctx: "Проводити паралель — ідея ⇒ висновок", ex: "We're cutting Display because of low ROAS. By the same token, we should reassess YouTube." },
+  { id: 179, cat: "Connectors", lvl: "B2", en: "More to the point,", uk: "Точніше кажучи, / Що важливіше,", ctx: "Перейти до головного аргументу", ex: "Yes, the budget is tight — but more to the point, we don't have the data to justify scaling yet." },
+
+  // ====== CASUAL / RAPPORT BUILDING ======
+  { id: 190, cat: "Rapport", lvl: "B1", en: "How's your week going?", uk: "Як проходить твій тиждень?", ctx: "Дружнє відкриття у чаті/мітингу", ex: "Hi Mark — how's your week going? Quick update on the launch…" },
+  { id: 191, cat: "Rapport", lvl: "B1+", en: "Hope you had a good weekend.", uk: "Сподіваюсь у тебе були гарні вихідні.", ctx: "Стандартний відкривач в понеділок", ex: "Morning Sarah — hope you had a good weekend!" },
+  { id: 192, cat: "Rapport", lvl: "B1+", en: "No worries at all.", uk: "Все нормально, без проблем.", ctx: "Дружньо відмахнутись від чужих перепрошень", ex: "Re: late reply — no worries at all, I know you've been heads down." },
+  { id: 193, cat: "Rapport", lvl: "B1+", en: "That makes total sense.", uk: "Це абсолютно логічно.", ctx: "Підтвердити що зрозуміла позицію клієнта", ex: "That makes total sense — let's go with your approach." },
+  { id: 194, cat: "Rapport", lvl: "B2", en: "I appreciate the context.", uk: "Дякую за контекст.", ctx: "Після того як клієнт пояснив фон", ex: "I appreciate the context — that changes my thinking on the budget split." },
+  { id: 195, cat: "Rapport", lvl: "B1+", en: "Heads down on a deadline.", uk: "Сиджу зосереджено над дедлайном.", ctx: "Пояснити чому повільно відповідаєш", ex: "Sorry for the delay — was heads down on the audit deadline." },
+  { id: 196, cat: "Rapport", lvl: "B2", en: "Let's not overcomplicate this.", uk: "Давай не будемо це ускладнювати.", ctx: "Повернути обговорення до простішого рішення", ex: "Let's not overcomplicate this — we can start with one campaign and scale from there." },
+
+  // ====== MARKETING COLLOCATIONS ======
+  { id: 200, cat: "Collocations", lvl: "B1+", en: "drive traffic / drive results / drive growth", uk: "генерувати трафік / результати / ріст", ctx: "Verb 'drive' — найпотужніший маркетинговий дієслово. Завжди йде з абстрактним результатом", ex: "The new ad copy is driving significantly more qualified traffic than the old one." },
+  { id: 201, cat: "Collocations", lvl: "B1+", en: "generate leads / generate demand / generate buzz", uk: "генерувати ліди / попит / шум навколо бренду", ctx: "Класичні функціональні зв'язки в lead-gen маркетингу", ex: "We need to generate more demand at the top of the funnel before optimising mid-funnel." },
+  { id: 202, cat: "Collocations", lvl: "B1+", en: "build awareness / build a pipeline / build momentum", uk: "будувати впізнаваність / пайплайн / імпульс", ctx: "'Build' = поступово створювати щось довгостроково", ex: "It'll take 4–6 weeks to build awareness before we expect conversions to lift." },
+  { id: 203, cat: "Collocations", lvl: "B2", en: "move the needle", uk: "рухати голку (= відчутно вплинути на показники)", ctx: "ТОП-1 маркетингова ідіома. Означає 'дати помітний результат'", ex: "Optimising button colour won't move the needle — let's redesign the whole landing page." },
+  { id: 204, cat: "Collocations", lvl: "B1+", en: "hit a target / miss the mark / fall short", uk: "досягти цілі / промахнутися / не дотягнути", ctx: "Базовий триплет дієслів про досягнення KPI", ex: "We hit our CPA target but fell short on volume by about 15%." },
+  { id: 205, cat: "Collocations", lvl: "B2", en: "raise the bar / set the bar high", uk: "підняти планку", ctx: "Про якість роботи або очікування", ex: "Their last campaign really raised the bar for what we should be delivering." },
+  { id: 206, cat: "Collocations", lvl: "B2", en: "gain traction", uk: "набирати оберти / починати працювати", ctx: "Про ідею, продукт або кампанію яка починає давати результати", ex: "The new creative is finally gaining traction — CTR is up 22% over the past week." },
+  { id: 207, cat: "Collocations", lvl: "B2", en: "bridge the gap (between X and Y)", uk: "закрити розрив (між X та Y)", ctx: "Про з'єднання двох речей або заповнення прогалини", ex: "The new dashboard bridges the gap between Search performance and revenue attribution." },
+  { id: 208, cat: "Collocations", lvl: "B1+", en: "boost / lift / spike conversions", uk: "підвищити / підняти / стрибково збільшити конверсії", ctx: "Boost = підняти стабільно; lift = + у короткостроковому періоді; spike = різкий стрибок", ex: "The seasonal promo gave us a 40% spike in conversions over three days." },
+  { id: 209, cat: "Collocations", lvl: "B1+", en: "tap into a market / tap into demand", uk: "увійти в ринок / використати попит", ctx: "Про використання нових можливостей", ex: "PMax lets us tap into demand we weren't capturing through Search alone." },
+  { id: 210, cat: "Collocations", lvl: "B2", en: "make a dent (in something)", uk: "помітно вплинути / 'зробити вмятину'", ctx: "Менше за 'move the needle', але реальний прогрес", ex: "We're making a dent in the wasted spend issue — down 8% MoM." },
+  { id: 211, cat: "Collocations", lvl: "B1+", en: "scale (a campaign / a budget / spend)", uk: "масштабувати кампанію / бюджет / витрати", ctx: "Найбільш вживане дієслово в performance marketing", ex: "Once we hit 30 conversions per week, we can scale the budget by 30%." },
+  { id: 212, cat: "Collocations", lvl: "B2", en: "stretch a budget", uk: "розтягнути бюджет / ефективно використати обмежений бюджет", ctx: "Коли ресурси обмежені — отримати максимум", ex: "We need to stretch the Q3 budget further — let's pause low-performing keywords." },
+  { id: 213, cat: "Collocations", lvl: "B2", en: "trim / cut / slash spend", uk: "підрізати / скоротити / різко обрізати витрати", ctx: "Trim = акуратно; cut = просто; slash = агресивно", ex: "Let's trim spend on Display and reinvest in Search where ROAS is stronger." },
+  { id: 214, cat: "Collocations", lvl: "B2", en: "the lion's share (of budget / traffic)", uk: "левова частка (бюджету / трафіку)", ctx: "Найбільша частина чогось", ex: "Search takes the lion's share of our budget — about 65%." },
+  { id: 215, cat: "Collocations", lvl: "B1+", en: "see strong / weak / mixed performance", uk: "показувати сильні / слабкі / змішані результати", ctx: "Універсальний коментар по даних", ex: "Brand campaigns are seeing strong performance, but generic terms are mixed." },
+  { id: 216, cat: "Collocations", lvl: "B2", en: "double down on (something)", uk: "удвічі вкластися в / зробити подвійну ставку на", ctx: "Інвестувати ще більше в те що працює", ex: "PMax is delivering — let's double down on it next quarter." },
+  { id: 217, cat: "Collocations", lvl: "B1+", en: "lean into (something)", uk: "робити ставку на / занурюватись в", ctx: "Менше ніж 'double down', але вибір напрямку", ex: "We should lean into video creative — that's where audiences are responding." },
+  { id: 218, cat: "Collocations", lvl: "B2", en: "low-hanging fruit", uk: "те що легко зірвати (= найпростіші покращення)", ctx: "Топ-ідіома агенцій. Прості зміни що дають швидкий результат", ex: "Before we do a full audit, let's grab the low-hanging fruit — adding negative keywords would save 12% right now." },
+  { id: 219, cat: "Collocations", lvl: "B2", en: "diminishing returns", uk: "спадна віддача", ctx: "Економічний термін — більше витрат не дає більше результату", ex: "We're hitting diminishing returns at $5K/day on Brand — anything above gets wasted." },
+  { id: 220, cat: "Collocations", lvl: "B2", en: "a deep dive (into something)", uk: "глибоке занурення / детальний аналіз", ctx: "Більш ретельний за 'analysis' аналіз", ex: "I'll do a deep dive into the search term report and send findings tomorrow." },
+  { id: 221, cat: "Collocations", lvl: "B2", en: "a quick win", uk: "швидкий виграш / легка перемога", ctx: "Маленька оптимізація з негайним ефектом", ex: "Quick win for next week: turn off ads on Sundays where ROAS is half." },
+  { id: 222, cat: "Collocations", lvl: "B2", en: "a no-brainer", uk: "очевидне рішення / 'без мозку зрозуміло'", ctx: "Коли вибір очевидний — без сумнівів", ex: "Pausing ads with negative ROAS is a no-brainer — should have been done last month." },
+  { id: 223, cat: "Collocations", lvl: "B2", en: "a game-changer", uk: "переломний момент / правило-змінювач", ctx: "Щось що кардинально змінює ситуацію", ex: "Switching to tROAS bidding has been a game-changer for this account." },
+  { id: 224, cat: "Collocations", lvl: "B1+", en: "moving parts", uk: "рухомі частини / складові процесу", ctx: "Багато речей що працюють разом — натяк на складність", ex: "There are a lot of moving parts here — let me schedule a call to walk through it." },
+  { id: 225, cat: "Collocations", lvl: "B2", en: "a ballpark figure / a ballpark estimate", uk: "приблизна оцінка / 'на око'", ctx: "Грубий розрахунок без точних даних", ex: "Just a ballpark figure — I'd say we're looking at $8–12K extra spend to scale properly." },
+  { id: 226, cat: "Collocations", lvl: "B2", en: "table stakes", uk: "базовий мінімум / 'плата за вхід'", ctx: "Те що мусить бути зроблено за замовчуванням, не перевага", ex: "Negative keyword hygiene is table stakes — every account should have this dialed in." },
+  { id: 227, cat: "Collocations", lvl: "B2", en: "north star metric", uk: "головна метрика / 'путівна зірка'", ctx: "Одна ключова метрика яка визначає успіх", ex: "Our north star metric for this account is profitable revenue, not just ROAS." },
+  { id: 228, cat: "Collocations", lvl: "B2", en: "the elephant in the room", uk: "слон у кімнаті (очевидна проблема яку ніхто не озвучує)", ctx: "Перед тим як підняти незручну тему", ex: "Let's address the elephant in the room — the conversion tracking has been broken since March." },
+  { id: 229, cat: "Collocations", lvl: "B2", en: "do the heavy lifting", uk: "виконувати основну роботу", ctx: "Про канал/процес що несе основне навантаження", ex: "Search is doing the heavy lifting — it's responsible for 70% of conversions." },
+  { id: 230, cat: "Collocations", lvl: "B2", en: "a win-win", uk: "взаємовигідне рішення", ctx: "Ситуація вигідна обом сторонам", ex: "Switching to value-based bidding is a win-win — better margins for you, easier optimisation for us." },
+
+  // ====== PHRASAL VERBS ======
+  { id: 240, cat: "Phrasal verbs", lvl: "B1", en: "kick off (a campaign / a meeting / a project)", uk: "запустити / розпочати", ctx: "Найзагальніше дієслово для початку чогось", ex: "We're kicking off the Q3 campaign next Monday." },
+  { id: 241, cat: "Phrasal verbs", lvl: "B1", en: "wrap up (a project / a call / a campaign)", uk: "завершити / закрити", ctx: "Протилежність kick off", ex: "Let's wrap up by 4pm — I have a hard stop." },
+  { id: 242, cat: "Phrasal verbs", lvl: "B1+", en: "roll out (a feature / a campaign / a change)", uk: "розгорнути / запустити в production", ctx: "Поступово запустити щось нове", ex: "We're rolling out the new attribution model across all accounts next week." },
+  { id: 243, cat: "Phrasal verbs", lvl: "B1+", en: "ramp up / ramp down (spend / activity)", uk: "поступово збільшити / зменшити", ctx: "Про поступову зміну темпу", ex: "Let's ramp up the budget by 10% each week to avoid spooking the algorithm." },
+  { id: 244, cat: "Phrasal verbs", lvl: "B1+", en: "scale up / scale down / scale back", uk: "масштабувати / згорнути / відкотити назад", ctx: "Scale back = обережне зменшення", ex: "We need to scale back on Display until we figure out the attribution issue." },
+  { id: 245, cat: "Phrasal verbs", lvl: "B1+", en: "drill down (into the data / into details)", uk: "заглибитися в деталі", ctx: "Перейти від загального до конкретного", ex: "Let's drill down into device-level performance — I think mobile is dragging the average." },
+  { id: 246, cat: "Phrasal verbs", lvl: "B1+", en: "zoom in on / zoom out from", uk: "наблизитись до / віддалитись від", ctx: "Перенесене значення — фокусуватись або дивитись ширше", ex: "Let's zoom out from individual keywords and look at the campaign-level trend." },
+  { id: 247, cat: "Phrasal verbs", lvl: "B1+", en: "loop someone in / loop someone out", uk: "включити в копію / прибрати з копії", ctx: "Про email/Slack обговорення", ex: "Looping in Sarah for visibility on the tracking issue." },
+  { id: 248, cat: "Phrasal verbs", lvl: "B2", en: "follow up (on something) / follow through (on something)", uk: "повертатись з нагадуванням / доводити до кінця", ctx: "Follow up = check in; follow through = виконати обіцяне до кінця", ex: "I'll follow up on the budget question Friday. And I'll follow through on the new tracking setup by EOW." },
+  { id: 249, cat: "Phrasal verbs", lvl: "B1+", en: "sign off on (something)", uk: "затвердити / підписати", ctx: "Про офіційне погодження", ex: "Once you sign off on the creative brief, we'll start production." },
+  { id: 250, cat: "Phrasal verbs", lvl: "B1+", en: "push back on (something)", uk: "заперечити / не погодитись з", ctx: "Особливо в робочому контексті — стримане заперечення", ex: "I'd push back on the timeline — two weeks isn't realistic for this scope." },
+  { id: 251, cat: "Phrasal verbs", lvl: "B2", en: "iron out (issues / details / kinks)", uk: "залагодити / 'розгладити' проблеми", ctx: "Залагодити дрібні проблеми перед запуском", ex: "We need a few more days to iron out the conversion tracking before we go live." },
+  { id: 252, cat: "Phrasal verbs", lvl: "B1+", en: "sort out (something) / sort through (something)", uk: "розібратися / перебрати", ctx: "Sort out = вирішити; sort through = перебрати щоб знайти", ex: "Let me sort through the search term report and pull out the winners." },
+  { id: 253, cat: "Phrasal verbs", lvl: "B2", en: "hash out (a plan / details)", uk: "обговорити і узгодити", ctx: "Жвава дискусія для досягнення згоди", ex: "Let's jump on a call Thursday and hash out the targeting strategy." },
+  { id: 254, cat: "Phrasal verbs", lvl: "B2", en: "flesh out (an idea / a plan)", uk: "деталізувати / 'наповнити плоттю'", ctx: "Додати деталі і конкретику до сирої ідеї", ex: "I like the direction — can you flesh out the implementation plan a bit more?" },
+  { id: 255, cat: "Phrasal verbs", lvl: "B1+", en: "walk (someone) through / run (someone) through", uk: "провести когось крок-за-кроком", ctx: "Пояснити деталі або процес комусь", ex: "Let me walk you through the audit findings — there are 3 main areas." },
+  { id: 256, cat: "Phrasal verbs", lvl: "B1+", en: "set up / set up a meeting / set up a call", uk: "налаштувати / організувати зустріч", ctx: "Технічне 'set up' (систему) і соціальне (зустріч)", ex: "Let me set up a 30-min call so we can walk through the dashboard together." },
+  { id: 257, cat: "Phrasal verbs", lvl: "B2", en: "pencil in (a meeting / a date)", uk: "попередньо записати в календар", ctx: "Тимчасово зарезервувати з можливістю скасування", ex: "Let's pencil in Wednesday at 2 — I'll confirm tomorrow." },
+  { id: 258, cat: "Phrasal verbs", lvl: "B2", en: "block off (time / a slot)", uk: "заблокувати час", ctx: "Зарезервувати час у календарі без переносів", ex: "I've blocked off Friday afternoon for the deep dive — please don't schedule over." },
+  { id: 259, cat: "Phrasal verbs", lvl: "B2", en: "carve out (time / budget for X)", uk: "виділити час / бюджет на щось", ctx: "Знайти і захистити ресурс для конкретної цілі", ex: "Let's carve out 15% of the test budget for YouTube experiments." },
+  { id: 260, cat: "Phrasal verbs", lvl: "B2", en: "bring (something) up", uk: "підняти питання / згадати", ctx: "Згадати тему в розмові", ex: "Glad you brought that up — it's exactly what I wanted to discuss." },
+  { id: 261, cat: "Phrasal verbs", lvl: "B2", en: "circle back (on something) / loop back", uk: "повернутися до питання пізніше", ctx: "Класичне 'corporate-speak' для відкладеного обговорення", ex: "Let's circle back on the creative direction once the data comes in." },
+  { id: 262, cat: "Phrasal verbs", lvl: "B2", en: "pivot away from / pivot to", uk: "розвернутися / переорієнтуватись", ctx: "Кардинальна зміна напрямку стратегії", ex: "We're pivoting away from broad match keywords and leaning into exact match." },
+  { id: 263, cat: "Phrasal verbs", lvl: "B2", en: "phase out (something)", uk: "поступово виводити з використання", ctx: "Не різко вимикати, а поступово зменшувати", ex: "We're phasing out manual bidding across all campaigns by end of quarter." },
+  { id: 264, cat: "Phrasal verbs", lvl: "B2", en: "bottom out / level off", uk: "досягти дна / стабілізуватись", ctx: "Про показники: bottom out = найнижче; level off = вирівнялося", ex: "CPCs seem to have bottomed out at $1.40 — we're not seeing further drops." },
+  { id: 265, cat: "Phrasal verbs", lvl: "B2", en: "tee (something) up", uk: "підготувати ґрунт / 'поставити м'яч на тi'", ctx: "З гольфу — підготувати щось для наступного кроку", ex: "I'll tee up the QBR deck so it's ready for your review by Friday." },
+  { id: 266, cat: "Phrasal verbs", lvl: "B1+", en: "go over (something)", uk: "пройтися по / переглянути", ctx: "Спільно переглянути матеріал", ex: "Can we go over the recommendations together on Wednesday?" },
+  { id: 267, cat: "Phrasal verbs", lvl: "B2", en: "go through / run through", uk: "пройти / прорепетирувати", ctx: "Перевірити крок за кроком", ex: "Let's go through the launch checklist before we hit publish." },
+  { id: 268, cat: "Phrasal verbs", lvl: "B2", en: "fall through (a deal / a plan)", uk: "зірватися / не відбутися", ctx: "Про плани або угоди що не відбулись", ex: "The partnership fell through, so we need to rethink the channel mix for Q3." },
+  { id: 269, cat: "Phrasal verbs", lvl: "B2", en: "back (someone / something) up", uk: "підтримати / підкріпити (даними)", ctx: "Підкріпити аргументами/доказами", ex: "I'll back up the recommendation with three case studies from similar accounts." },
+  { id: 270, cat: "Phrasal verbs", lvl: "B1+", en: "lay out (a plan / a strategy)", uk: "викласти / розкласти по поличках", ctx: "Структурно представити план", ex: "I've laid out the next 90 days in the deck — let me know if anything's unclear." },
+  { id: 271, cat: "Phrasal verbs", lvl: "B2", en: "pull (the data / a report) / pull together", uk: "витягнути дані / зібрати звіт", ctx: "Pull = витягнути з системи; pull together = зібрати докупи", ex: "Let me pull the data and put together a summary by EOD." },
+  { id: 272, cat: "Phrasal verbs", lvl: "B1+", en: "come up with (an idea / a plan)", uk: "придумати / прийти до", ctx: "Креативно знайти рішення", ex: "Can you come up with three creative concepts by Thursday?" },
+  { id: 273, cat: "Phrasal verbs", lvl: "B2", en: "lock in / lock down", uk: "зафіксувати / закріпити", ctx: "Зробити щось остаточним і незмінним", ex: "Once we lock in the budget, I'll restructure the campaigns accordingly." },
+  { id: 274, cat: "Phrasal verbs", lvl: "B2", en: "sort out the kinks / iron out the wrinkles", uk: "залагодити нюанси / 'розгладити складки'", ctx: "Прибрати дрібні проблеми перед запуском", ex: "Give us another sprint to iron out the wrinkles in the tracking setup." },
+
+  // ====== POWER PHRASES & ADVANCED ======
+  { id: 290, cat: "Power phrases", lvl: "B2", en: "From a data perspective, / From a strategic standpoint,", uk: "З точки зору даних / стратегії,", ctx: "Потужний спосіб ввести експертну думку", ex: "From a data perspective, the dip is driven by weekend mobile traffic — not a real performance issue." },
+  { id: 291, cat: "Power phrases", lvl: "B2", en: "What this tells us is…", uk: "Що це нам говорить —…", ctx: "Перейти від даних до інсайту", ex: "Conversions are up but AOV is down. What this tells us is we're attracting more bargain hunters." },
+  { id: 292, cat: "Power phrases", lvl: "B2", en: "The hypothesis is that…", uk: "Гіпотеза в тому що…", ctx: "Дуже професійно — представити припущення яке тестуємо", ex: "The hypothesis is that broad match is bringing in unqualified traffic — this test will confirm it." },
+  { id: 293, cat: "Power phrases", lvl: "B2", en: "Let's look at the underlying drivers.", uk: "Давай подивимось на глибинні фактори.", ctx: "Перейти від симптомів до причин", ex: "ROAS is down — but let's look at the underlying drivers before we react." },
+  { id: 294, cat: "Power phrases", lvl: "B2", en: "I want to set us up for success.", uk: "Хочу налаштувати нас на успіх.", ctx: "Філософське — про підготовку проекту правильно", ex: "Before we launch, I want to make sure tracking is bulletproof — I want to set us up for success." },
+  { id: 295, cat: "Power phrases", lvl: "B2", en: "Let's sanity-check this.", uk: "Давай перевіримо це на здоровий глузд.", ctx: "Швидка перевірка чи рішення взагалі логічне", ex: "Before we send the report, let's sanity-check the numbers — this conversion lift looks too good." },
+  { id: 296, cat: "Power phrases", lvl: "B2", en: "We need to be intentional about this.", uk: "Маємо підходити до цього усвідомлено.", ctx: "Про обдумані рішення замість реактивних", ex: "We need to be intentional about budget allocation — not just react to weekly fluctuations." },
+  { id: 297, cat: "Power phrases", lvl: "B2", en: "Let's not boil the ocean.", uk: "Давай не намагатись зробити все одразу.", ctx: "Класична corporate-ідіома — не братися за нереально великий обсяг роботи", ex: "Let's not boil the ocean — we'll start with the top 3 campaigns and expand from there." },
+  { id: 298, cat: "Power phrases", lvl: "B2", en: "It's table stakes at this point.", uk: "Це базовий обов'язок зараз.", ctx: "Те що повинно бути зроблено мінімум", ex: "Conversion tracking accuracy is table stakes at this point — we can't optimise without it." },
+  { id: 299, cat: "Power phrases", lvl: "B2", en: "We're flying blind without [data / tracking].", uk: "Ми летимо наосліп без [даних / трекінгу].", ctx: "Немає видимості в результати — ризиковано приймати рішення", ex: "We're flying blind without proper conversion tracking — fixing it is priority #1." },
+  { id: 300, cat: "Power phrases", lvl: "B2", en: "Let's de-risk this approach.", uk: "Зменшимо ризик цього підходу.", ctx: "Зробити план менш ризикованим", ex: "Let's de-risk this approach — we'll start with 10% of budget instead of 50%." },
+  { id: 301, cat: "Power phrases", lvl: "B2", en: "I want to keep us honest on…", uk: "Хочу щоб ми залишались чесними щодо…", ctx: "Запрошення до чесної самооцінки", ex: "I want to keep us honest on attribution — half of these conversions might be coming through organic anyway." },
+  { id: 302, cat: "Power phrases", lvl: "B2", en: "There's signal in the noise.", uk: "В шумі є сигнал.", ctx: "Серед хаосу даних є важливий патерн", ex: "Look — week-to-week numbers are noisy, but there's signal in the noise: long-tail terms are converting 3x better." },
+  { id: 303, cat: "Power phrases", lvl: "B2", en: "Let's let the data speak.", uk: "Дамо даним говорити самим за себе.", ctx: "Не прийняття рішень на емоціях", ex: "I have a hunch about this, but let's let the data speak — we'll have results by Friday." },
+  { id: 304, cat: "Power phrases", lvl: "B2", en: "Let's not optimize for vanity metrics.", uk: "Давай не оптимізувати під 'марні' метрики.", ctx: "Vanity metrics = метрики які виглядають красиво але не приносять бізнес-результат", ex: "CTR is up but conversions are flat — let's not optimize for vanity metrics." },
+
+  // ====== NEGOTIATION & SCOPE ======
+  { id: 310, cat: "Negotiation", lvl: "B2", en: "That's outside the scope of this engagement.", uk: "Це поза рамками поточної угоди.", ctx: "Коли клієнт просить щось не зазначене в контракті", ex: "Building a CRM integration is outside the scope of this engagement — happy to scope a separate project." },
+  { id: 311, cat: "Negotiation", lvl: "B1+", en: "Let's revisit the scope.", uk: "Давай переглянемо обсяг робіт.", ctx: "Коли треба розширити або звузити роботи", ex: "Given the new goals, let's revisit the scope before we kick off Q3." },
+  { id: 312, cat: "Negotiation", lvl: "B2", en: "We can absolutely do that, but it would push the timeline.", uk: "Це можливо зробити, але це посуне терміни.", ctx: "Класичний trade-off — згода + наслідки", ex: "We can absolutely add YouTube, but it would push the launch to mid-July." },
+  { id: 313, cat: "Negotiation", lvl: "B2", en: "Within budget / out of budget", uk: "В межах бюджету / поза бюджетом", ctx: "Базовий формальний термін", ex: "Phase 1 is well within budget. Phase 2 would be out of our current budget." },
+  { id: 314, cat: "Negotiation", lvl: "B2", en: "We're at capacity right now.", uk: "Ми зараз завантажені на максимум.", ctx: "Не можемо взяти більше роботи", ex: "We're at capacity right now — earliest we could take this on is in 3 weeks." },
+  { id: 315, cat: "Negotiation", lvl: "B2", en: "I want to set realistic expectations.", uk: "Хочу задати реалістичні очікування.", ctx: "Перед обговоренням обмежень", ex: "Before we proceed, I want to set realistic expectations on what's achievable in 4 weeks." },
+  { id: 316, cat: "Negotiation", lvl: "B2", en: "What would you be willing to deprioritize?", uk: "Чим ти готовий пожертвувати в пріоритетах?", ctx: "Коли клієнт хоче все одразу", ex: "If we add the new product launch, what would you be willing to deprioritize from the existing roadmap?" },
+  { id: 317, cat: "Negotiation", lvl: "B2", en: "There's a trade-off here.", uk: "Тут є компроміс.", ctx: "Перед поясненням двох взаємовиключних варіантів", ex: "There's a trade-off here: faster launch means less testing time." },
+  { id: 318, cat: "Negotiation", lvl: "B1+", en: "We can prioritize speed or quality — not both.", uk: "Швидкість або якість — обираємо одне.", ctx: "Класичний triangle — fast/cheap/good — pick two", ex: "We can prioritize speed or quality — not both. Which matters more for this launch?" },
+  { id: 319, cat: "Negotiation", lvl: "B2", en: "Scope creep", uk: "Розповзання скоупу — коли проект непомітно росте", ctx: "Стандартний термін у консалтингу", ex: "We need to watch out for scope creep — three small additions have already added a week to the timeline." },
+  { id: 320, cat: "Negotiation", lvl: "B2", en: "If we add X, something else has to give.", uk: "Якщо додамо X, щось інше доведеться прибрати.", ctx: "Спокійне нагадування про обмеженість ресурсів", ex: "If we add the social campaign, something else has to give — either Display or the Q3 audit." },
+  { id: 321, cat: "Negotiation", lvl: "B1+", en: "Let's renegotiate the terms.", uk: "Давай перепогодимо умови.", ctx: "Коли вихідні умови вже не підходять", ex: "Given the bigger budget, let's renegotiate the terms for the second half of the year." },
+  { id: 322, cat: "Negotiation", lvl: "B2", en: "I can fast-track this for an additional fee.", uk: "Можу прискорити це за додаткову плату.", ctx: "Чесна пропозиція спідапу за гроші", ex: "Standard turnaround is 5 days. I can fast-track this for an additional fee — 24 hours." },
+  { id: 323, cat: "Negotiation", lvl: "B2", en: "That's a hard no for me.", uk: "Це жорстке 'ні' з мого боку.", ctx: "Тверда дружня відмова", ex: "Cutting tracking budget is a hard no for me — we'd be flying blind." },
+  { id: 324, cat: "Negotiation", lvl: "B2", en: "Let's meet in the middle.", uk: "Зустрінемось посередині.", ctx: "Запропонувати компроміс", ex: "You want 50%, I'd suggest 20% — let's meet in the middle at 30%." },
+  { id: 325, cat: "Negotiation", lvl: "B2", en: "Let's find a middle ground.", uk: "Знайдімо компроміс.", ctx: "М'якше за 'meet in the middle'", ex: "I hear you on speed and I'm worried about quality — let's find a middle ground." },
+  { id: 326, cat: "Negotiation", lvl: "B2", en: "What's a must-have vs a nice-to-have?", uk: "Що обов'язкове, а що 'було б добре'?", ctx: "Розділити пріоритети", ex: "Before we scope this out — what's a must-have vs a nice-to-have for the launch?" },
+  { id: 327, cat: "Negotiation", lvl: "B2", en: "We're aligned on X, just not on Y.", uk: "Ми згодні щодо X, лише з Y не сходимось.", ctx: "Виділити точки згоди перед спірним пунктом", ex: "We're aligned on the strategy, just not on the timeline." },
+  { id: 328, cat: "Negotiation", lvl: "B1+", en: "Let's lock in the scope before we proceed.", uk: "Давайте зафіксуємо скоуп перед тим, як рухатись далі.", ctx: "Запобігти scope creep на старті", ex: "Let's lock in the scope before we proceed — once we're 2 weeks in, changes will be expensive." },
+  { id: 329, cat: "Negotiation", lvl: "B2", en: "What's the budget ceiling?", uk: "Який максимальний бюджет?", ctx: "Запитати про верхню межу", ex: "Before I scope this out — what's the budget ceiling we're working with?" },
+  { id: 330, cat: "Negotiation", lvl: "B2", en: "I'd rather walk away than lower the standard.", uk: "Краще відмовлюсь, ніж знижуватиму стандарт.", ctx: "Жорстко — про принципи якості", ex: "If we can't track conversions properly, I'd rather walk away than lower the standard." },
+
+  // ====== PROJECT MANAGEMENT ======
+  { id: 350, cat: "Project mgmt", lvl: "B1+", en: "I'm blocked on X.", uk: "Заблокована через X.", ctx: "Не можу рухатись далі через залежність", ex: "I'm blocked on the Merchant Center access — can you nudge IT?" },
+  { id: 351, cat: "Project mgmt", lvl: "B1+", en: "We're waiting on…", uk: "Чекаємо на… (щоб розблокуватись)", ctx: "Назвати конкретно що блокує", ex: "We're waiting on the dev team to push the new tracking pixel before we can launch." },
+  { id: 352, cat: "Project mgmt", lvl: "B2", en: "What's the dependency?", uk: "Яка є залежність?", ctx: "З'ясувати що від чого залежить", ex: "Before I commit to a date — what's the dependency on the Salesforce side?" },
+  { id: 353, cat: "Project mgmt", lvl: "B1+", en: "Let's unblock this.", uk: "Давай розблокуємо це.", ctx: "Активний підхід до проблеми", ex: "Let's unblock this today — I'll set up a quick call with all stakeholders." },
+  { id: 354, cat: "Project mgmt", lvl: "B2", en: "It's on the critical path.", uk: "Це на критичному шляху проекту.", ctx: "Затримка цього блокує весь проект", ex: "Conversion tracking is on the critical path — everything downstream depends on it." },
+  { id: 355, cat: "Project mgmt", lvl: "B1+", en: "Hand-off to [team / person]", uk: "Передача справ команді/людині", ctx: "Передача роботи між людьми", ex: "I'll do the hand-off to design once the brief is approved." },
+  { id: 356, cat: "Project mgmt", lvl: "B1+", en: "Bring (someone) up to speed", uk: "Ввести (когось) в курс справ", ctx: "Швидко ввести нову людину в проект", ex: "Let me bring you up to speed on what we've tried so far." },
+  { id: 357, cat: "Project mgmt", lvl: "B2", en: "Cross-functional team / cross-functional collaboration", uk: "Крос-функціональна команда / співпраця", ctx: "Команда з різних дисциплін (design, dev, marketing)", ex: "This needs cross-functional collaboration between marketing, dev, and product." },
+  { id: 358, cat: "Project mgmt", lvl: "B2", en: "Stakeholders", uk: "Стейкхолдери — зацікавлені сторони", ctx: "Усі хто може впливати або зазнає впливу від проекту", ex: "Let's loop in all stakeholders before we make this call." },
+  { id: 359, cat: "Project mgmt", lvl: "B1+", en: "I'll own that.", uk: "Я візьму це на себе.", ctx: "Взяти відповідальність за конкретну задачу", ex: "I'll own that — getting the brief done by Friday." },
+  { id: 360, cat: "Project mgmt", lvl: "B1+", en: "Who owns this?", uk: "Хто за це відповідає?", ctx: "З'ясувати DRI", ex: "Quick check — who owns this on your team?" },
+  { id: 361, cat: "Project mgmt", lvl: "B2", en: "DRI — Directly Responsible Individual", uk: "Безпосередньо відповідальна особа", ctx: "Apple-стиль — одна людина за кожну задачу", ex: "Every action item needs a DRI — otherwise things slip through." },
+  { id: 362, cat: "Project mgmt", lvl: "B2", en: "RACI — Responsible / Accountable / Consulted / Informed", uk: "Матриця ролей у проекті", ctx: "Хто що робить, хто узгоджує, кого інформують", ex: "Before we start, let's draft a RACI for clarity on who decides what." },
+  { id: 363, cat: "Project mgmt", lvl: "B1+", en: "We're behind schedule / on schedule / ahead of schedule", uk: "Відстаємо / за графіком / випереджаємо", ctx: "Стандартні фрази звітності", ex: "We're slightly behind schedule — three days behind, but recoverable." },
+  { id: 364, cat: "Project mgmt", lvl: "B1+", en: "We're slipping on the deadline.", uk: "Зриваємо дедлайн.", ctx: "М'яко повідомити про затримку", ex: "Heads-up — we're slipping on the deadline by about a week." },
+  { id: 365, cat: "Project mgmt", lvl: "B2", en: "We need to descope.", uk: "Треба зменшити обсяг робіт.", ctx: "Прибрати частину функціоналу щоб встигнути", ex: "Given the timeline, we need to descope the dashboard from v1 — adding it in v2." },
+  { id: 366, cat: "Project mgmt", lvl: "B2", en: "Let's spike on this.", uk: "Давайте швидко дослідимо це.", ctx: "Швидке дослідження тех-питання перед оцінкою", ex: "Before we commit to feasibility, let's spike on this for a day." },
+  { id: 367, cat: "Project mgmt", lvl: "B2", en: "Time-box this to X hours.", uk: "Обмеж це Х годинами.", ctx: "Жорстке обмеження часу на задачу", ex: "Time-box the research to 4 hours — if we don't have an answer by then, we make a call." },
+  { id: 368, cat: "Project mgmt", lvl: "B2", en: "Build a buffer into the timeline.", uk: "Закласти буфер у термінах.", ctx: "Запас на непередбачуване", ex: "Let's build a 2-week buffer into the timeline — there will be surprises." },
+  { id: 369, cat: "Project mgmt", lvl: "B2", en: "It's gated by [thing].", uk: "Це залежить від… (чекає на схвалення)", ctx: "Не можна рухатись поки [thing] не зроблено", ex: "Launch is gated by legal review — can't go live without it." },
+  { id: 370, cat: "Project mgmt", lvl: "B1+", en: "Greenlight / red light it", uk: "Дати зелене світло / зупинити", ctx: "Схвалити або заблокувати ініціативу", ex: "We need someone senior to greenlight the budget increase." },
+  { id: 371, cat: "Project mgmt", lvl: "B1+", en: "Sign-off (final approval)", uk: "Фінальна апрувка", ctx: "Офіційне погодження", ex: "I need your sign-off before we push to production." },
+  { id: 372, cat: "Project mgmt", lvl: "B2", en: "Post-mortem (after the launch)", uk: "Розбір польотів після запуску", ctx: "Аналіз що пішло добре і погано", ex: "Let's schedule a post-mortem next Friday — both wins and lessons." },
+  { id: 373, cat: "Project mgmt", lvl: "B2", en: "Pre-mortem (before the launch)", uk: "Передпрогноз — що може піти не так", ctx: "Прорахувати ризики до старту", ex: "Let's do a pre-mortem — imagine it failed, what would have caused it?" },
+  { id: 374, cat: "Project mgmt", lvl: "B2", en: "Action items / next steps", uk: "Завдання / наступні кроки", ctx: "Стандартний кінець мітингу", ex: "Let me capture the action items before we wrap." },
+  { id: 375, cat: "Project mgmt", lvl: "B2", en: "Single source of truth", uk: "Єдине джерело правди (документ/система)", ctx: "Один авторитетний документ де все актуальне", ex: "Notion is our single source of truth — everything else is just a copy." },
+  { id: 376, cat: "Project mgmt", lvl: "B2", en: "Get on the same page", uk: "Бути на одній хвилі", ctx: "Узгодити розуміння", ex: "Let's get on the same page before the client call." },
+  { id: 377, cat: "Project mgmt", lvl: "B2", en: "Run point on (something)", uk: "Бути головним по чомусь / координувати", ctx: "Лідирувати конкретну ініціативу", ex: "Sarah will run point on the new client onboarding." },
+  { id: 378, cat: "Project mgmt", lvl: "B2", en: "Drive (a project / initiative)", uk: "Вести / просувати (проект)", ctx: "Активне керівництво з кінцевим результатом", ex: "I'll drive the migration to GA4 across all client accounts." },
+
+  // ====== TRENDS & PATTERNS ======
+  { id: 400, cat: "Trends & data", lvl: "B1+", en: "Numbers spiked / surged.", uk: "Цифри різко зросли.", ctx: "Різкий стрибок угору", ex: "Conversions spiked 40% on Friday — likely the email campaign." },
+  { id: 401, cat: "Trends & data", lvl: "B1+", en: "Numbers cratered / tanked.", uk: "Цифри впали в яму.", ctx: "Різкий обвал униз", ex: "ROAS cratered last weekend — investigating now." },
+  { id: 402, cat: "Trends & data", lvl: "B1+", en: "Steady growth / steady decline.", uk: "Стабільне зростання / зниження.", ctx: "Поступовий тренд", ex: "We've seen steady growth in branded searches — about 8% MoM." },
+  { id: 403, cat: "Trends & data", lvl: "B1+", en: "Leveled off / plateaued.", uk: "Вирівнялось / вийшло на плато.", ctx: "Зростання зупинилось", ex: "CTR has plateaued at around 4.5% — time to test new headlines." },
+  { id: 404, cat: "Trends & data", lvl: "B1+", en: "Bouncing back.", uk: "Відновлюється.", ctx: "Після просідання повернення", ex: "Performance is bouncing back after last week's tracking issue." },
+  { id: 405, cat: "Trends & data", lvl: "B2", en: "Volatile / unstable.", uk: "Нестабільне / коливається.", ctx: "Великі коливання день до дня", ex: "Daily ROAS is volatile, but the 7-day average looks healthy." },
+  { id: 406, cat: "Trends & data", lvl: "B1+", en: "Holding steady.", uk: "Тримається на рівні.", ctx: "Без особливих змін — стабільно", ex: "CPCs are holding steady around $1.40 — no surprises there." },
+  { id: 407, cat: "Trends & data", lvl: "B1+", en: "QoQ / YoY / MoM / WoW", uk: "Скорочення для періодів порівняння", ctx: "Quarter / Year / Month / Week-over-week", ex: "Revenue is up 28% YoY but flat WoW." },
+  { id: 408, cat: "Trends & data", lvl: "B2", en: "An outlier in the data", uk: "Викид у даних — окрема точка-аномалія", ctx: "Точка яка випадає з тренду", ex: "Tuesday is an outlier — a single big-ticket sale skewed the average." },
+  { id: 409, cat: "Trends & data", lvl: "B2", en: "An anomaly worth investigating", uk: "Аномалія, варта дослідження", ctx: "Щось не вписується — треба зрозуміти чому", ex: "There's a spike on mobile only — that's an anomaly worth investigating." },
+  { id: 410, cat: "Trends & data", lvl: "B2", en: "A statistical blip.", uk: "Статистичний шум — нічого серйозного", ctx: "Малозначущі коливання", ex: "I wouldn't read into Saturday's drop — looks like a statistical blip." },
+  { id: 411, cat: "Trends & data", lvl: "B2", en: "Trending in the right / wrong direction.", uk: "Рухається в правильному / неправильному напрямку.", ctx: "Загальна оцінка тренду", ex: "Conversions are trending in the right direction — slowly, but consistently." },
+  { id: 412, cat: "Trends & data", lvl: "B2", en: "On an upward / downward trajectory.", uk: "На висхідній / спадній траєкторії.", ctx: "Більш формально — про довгий тренд", ex: "We're on an upward trajectory across all key metrics for Q2." },
+  { id: 413, cat: "Trends & data", lvl: "B2", en: "Hockey-stick growth.", uk: "Хокейна клюшка — різке зростання після плато", ctx: "Класична метафора SaaS-ринку", ex: "The new audience targeting drove hockey-stick growth in week 3." },
+  { id: 414, cat: "Trends & data", lvl: "B2", en: "Drop-off in the funnel", uk: "Падіння у воронці на конкретному етапі", ctx: "Де користувачі покидають воронку", ex: "There's a major drop-off between add-to-cart and checkout — UX issue." },
+  { id: 415, cat: "Trends & data", lvl: "B2", en: "There's a clear pattern emerging.", uk: "Чітко проявляється патерн.", ctx: "Видно повторюваність", ex: "Looking at the past 4 weeks, there's a clear pattern emerging — Tuesdays underperform." },
+  { id: 416, cat: "Trends & data", lvl: "B2", en: "The data is inconclusive.", uk: "Дані не дають однозначної відповіді.", ctx: "Чесно — поки нічого ясного не видно", ex: "After two weeks the data is inconclusive — let's run another two." },
+  { id: 417, cat: "Trends & data", lvl: "B2", en: "Statistically significant", uk: "Статистично значуще — не випадковість", ctx: "Стандартний термін A/B тестів", ex: "The lift is statistically significant at 95% confidence — we can call this a winner." },
+  { id: 418, cat: "Trends & data", lvl: "B2", en: "Within the margin of error", uk: "У межах похибки — нічого не довести", ctx: "Різниця надто мала щоб робити висновки", ex: "Variant B is up 1.2% but it's within the margin of error." },
+  { id: 419, cat: "Trends & data", lvl: "B2", en: "A meaningful lift / a marginal change", uk: "Суттєвий приріст / незначна зміна", ctx: "Оцінка масштабу зміни", ex: "We saw a meaningful lift on the new landing page — 18% conversion lift." },
+  { id: 420, cat: "Trends & data", lvl: "B2", en: "Performance has tapered off.", uk: "Результати поступово зменшуються.", ctx: "Поступове згасання тренду", ex: "Performance has tapered off after the initial launch — time to refresh creative." },
+  { id: 421, cat: "Trends & data", lvl: "B1+", en: "Numbers are noisy this week.", uk: "Цифри цього тижня хаотичні.", ctx: "Багато коливань без чіткого тренду", ex: "Numbers are noisy this week because of the holiday — let's wait before reacting." },
+  { id: 422, cat: "Trends & data", lvl: "B2", en: "Filter out the noise / signal vs noise", uk: "Відфільтрувати шум / сигнал проти шуму", ctx: "Виділити важливе серед хаотичних даних", ex: "The trick is filtering out the noise to find the real signal." },
+  { id: 423, cat: "Trends & data", lvl: "B2", en: "Cherry-pick the data", uk: "Вибірково подавати дані — негативно", ctx: "Показувати тільки зручні дані", ex: "Let's not cherry-pick the data — show the full month, not just the best week." },
+  { id: 424, cat: "Trends & data", lvl: "B2", en: "Directional vs definitive insight", uk: "Орієнтовно проти однозначно — про дані", ctx: "Чи дані дають точну відповідь чи тільки натяк", ex: "These results are directional — to be definitive we'd need 4 more weeks." },
+  { id: 425, cat: "Trends & data", lvl: "B2", en: "Leading indicator vs lagging indicator", uk: "Випереджаючий vs запізнілий індикатор", ctx: "Метрики що передбачають vs ті що відображають минуле", ex: "CTR is a leading indicator; revenue is lagging." },
+  { id: 426, cat: "Trends & data", lvl: "B2", en: "Year-on-year (YoY) the numbers are up.", uk: "Рік до року цифри ростуть.", ctx: "Найважливіше порівняння для seasonality", ex: "YoY the numbers are up 35% — very strong quarter." },
+
+  // ====== STRATEGY ======
+  { id: 450, cat: "Strategy", lvl: "B2", en: "What's the strategic rationale?", uk: "Який стратегічний обґрунтування?", ctx: "Чому ми це робимо взагалі", ex: "Before we scale Display, what's the strategic rationale?" },
+  { id: 451, cat: "Strategy", lvl: "B2", en: "Stay aligned with the bigger picture.", uk: "Тримайся в межах загальної картини.", ctx: "Не загубитись в тактичних деталях", ex: "Yes, this CPC is high, but stay aligned with the bigger picture — it's our highest-LTV channel." },
+  { id: 452, cat: "Strategy", lvl: "B2", en: "Big-picture vs granular details", uk: "Великий план vs дрібниці", ctx: "Зум-аут vs зум-ін", ex: "Today let's focus on big-picture; we'll get into granular details next week." },
+  { id: 453, cat: "Strategy", lvl: "B2", en: "Top-down vs bottom-up approach", uk: "Підхід зверху-вниз vs знизу-вверх", ctx: "Hierarchical vs grassroots планування", ex: "Top-down: leadership sets the goal. Bottom-up: we estimate from current performance." },
+  { id: 454, cat: "Strategy", lvl: "B1+", en: "Phase 1 / Phase 2 / Phase 3", uk: "Фаза 1, 2, 3", ctx: "Розбити велику ініціативу на етапи", ex: "Phase 1 is hygiene work, Phase 2 is testing, Phase 3 is scale." },
+  { id: 455, cat: "Strategy", lvl: "B2", en: "Roadmap for the next quarter", uk: "Дорожня карта на наступний квартал", ctx: "Високорівневий план", ex: "I'll share the Q3 roadmap by Friday — you'll see how all the pieces fit." },
+  { id: 456, cat: "Strategy", lvl: "B2", en: "Crawl, walk, run approach", uk: "Підхід 'повзати, ходити, бігти' — поетапно", ctx: "Класична метафора поступового масштабування", ex: "Crawl, walk, run — let's start small, prove it works, then scale." },
+  { id: 457, cat: "Strategy", lvl: "B2", en: "Test, learn, scale", uk: "Тестувати, вчитись, масштабувати", ctx: "Performance marketing мантра", ex: "Standard performance approach: test, learn, scale — and only what proves out." },
+  { id: 458, cat: "Strategy", lvl: "B2", en: "MVP — minimum viable product / minimum viable test", uk: "Мінімальний життєздатний продукт/тест", ctx: "Найменша версія для перевірки гіпотези", ex: "Let's launch an MVP campaign — one ad group, one keyword theme — to validate before scaling." },
+  { id: 459, cat: "Strategy", lvl: "B2", en: "Prove it out before scaling.", uk: "Спочатку довести, потім масштабувати.", ctx: "Не вкладати багато в недоведене", ex: "Two-week test first — let's prove it out before scaling." },
+  { id: 460, cat: "Strategy", lvl: "B2", en: "Working backward from the goal", uk: "Йти від цілі назад", ctx: "Amazon-style методологія", ex: "Working backward from the goal: $500K Q3 revenue → 2,500 conversions → ~$200 CPA → $500K spend." },
+  { id: 461, cat: "Strategy", lvl: "B2", en: "First principles thinking", uk: "Мислення з перших принципів — не від аналогій", ctx: "Ламати проблему до базових елементів", ex: "Let's apply first principles thinking — forget what worked before, what does the math actually say?" },
+  { id: 462, cat: "Strategy", lvl: "B2", en: "Prioritization framework", uk: "Фреймворк пріоритезації", ctx: "Систематичний підхід до вибору задач", ex: "I use ICE as a prioritization framework — Impact, Confidence, Ease." },
+  { id: 463, cat: "Strategy", lvl: "B2", en: "Impact / Effort matrix", uk: "Матриця Вплив / Зусилля", ctx: "2x2 для пріоритезації", ex: "Plotting these on an Impact/Effort matrix — quick wins are top-right." },
+  { id: 464, cat: "Strategy", lvl: "B2", en: "Highest-leverage activity", uk: "Дія з максимальним важелем", ctx: "Малі зусилля → великий результат", ex: "The highest-leverage activity for this account is fixing the feed — everything else is downstream." },
+  { id: 465, cat: "Strategy", lvl: "B2", en: "Quick wins vs strategic bets", uk: "Швидкі перемоги vs стратегічні ставки", ctx: "Tactical vs strategic роботи", ex: "We need a balance of quick wins and strategic bets — not just one." },
+  { id: 466, cat: "Strategy", lvl: "B2", en: "What's our bet here?", uk: "Яку ставку ми тут робимо?", ctx: "На що саме ми ставимо в цьому плані", ex: "What's our bet here? That video creative beats static — let's design the test that way." },
+  { id: 467, cat: "Strategy", lvl: "B2", en: "Hypothesis-driven approach", uk: "Підхід на основі гіпотез", ctx: "Кожна дія тестує конкретну гіпотезу", ex: "Hypothesis-driven approach — every campaign should be testing something specific." },
+  { id: 468, cat: "Strategy", lvl: "B2", en: "Iterate quickly / iterate based on data", uk: "Швидко ітерувати / ітерувати на основі даних", ctx: "Постійні дрібні покращення", ex: "We iterate quickly — weekly tests, weekly optimisations." },
+  { id: 469, cat: "Strategy", lvl: "B2", en: "Pivot when needed.", uk: "Робити поворот коли треба.", ctx: "Не триматись за неробочий план", ex: "We're 4 weeks in with no traction — time to pivot." },
+  { id: 470, cat: "Strategy", lvl: "B2", en: "Sunset (an initiative / a campaign)", uk: "Закрити ініціативу / кампанію", ctx: "Поступово вивести з використання", ex: "Let's sunset the legacy Display campaigns — the new structure is outperforming." },
+  { id: 471, cat: "Strategy", lvl: "B2", en: "Greenlight the project / kill the project", uk: "Дати зелене світло / закрити проект", ctx: "Бінарне рішення про долю ініціативи", ex: "Based on Q1 data, we should greenlight the rollout — strong ROI." },
+  { id: 472, cat: "Strategy", lvl: "B2", en: "Double click on this.", uk: "Подвійне натискання — заглибитись в тему", ctx: "Стандартна корпоративна фраза", ex: "Let's double click on this — what specifically isn't working?" },
+
+  // ====== CLIENT ONBOARDING ======
+  { id: 490, cat: "Onboarding", lvl: "B1+", en: "Tell me a bit about your business.", uk: "Розкажи трохи про свій бізнес.", ctx: "Discovery question — для першого мітингу", ex: "Before we dive in, tell me a bit about your business — what does success look like?" },
+  { id: 491, cat: "Onboarding", lvl: "B2", en: "What does success look like for you?", uk: "Як виглядає успіх для тебе?", ctx: "Зрозуміти власні KPI клієнта", ex: "What does success look like for you in 6 months? Revenue? Growth rate? Profitability?" },
+  { id: 492, cat: "Onboarding", lvl: "B2", en: "What's your North Star metric?", uk: "Яка ваша головна метрика?", ctx: "Визначити одну ключову мету", ex: "Before we plan tactics — what's your North Star metric for this account?" },
+  { id: 493, cat: "Onboarding", lvl: "B2", en: "Walk me through your customer journey.", uk: "Проведи мене по шляху клієнта.", ctx: "Зрозуміти воронку від першого кліку до покупки", ex: "Walk me through your customer journey — how do people typically discover and buy from you?" },
+  { id: 494, cat: "Onboarding", lvl: "B2", en: "Who are your competitors?", uk: "Хто ваші конкуренти?", ctx: "Discovery — конкурентний аналіз", ex: "Who are your top three competitors, and what makes you different?" },
+  { id: 495, cat: "Onboarding", lvl: "B2", en: "What's worked / hasn't worked in the past?", uk: "Що працювало / не працювало в минулому?", ctx: "Не повторювати чужих помилок", ex: "Quick context check — what's worked and what hasn't worked in the past on this account?" },
+  { id: 496, cat: "Onboarding", lvl: "B1+", en: "What's the budget you're working with?", uk: "З яким бюджетом ми працюємо?", ctx: "Чесно і прямо про гроші", ex: "What's the budget you're working with — monthly or quarterly?" },
+  { id: 497, cat: "Onboarding", lvl: "B2", en: "How will we measure success together?", uk: "Як ми будемо вимірювати успіх разом?", ctx: "Дефінити KPI на старті", ex: "Before we kick off — how will we measure success together? What metrics matter most?" },
+  { id: 498, cat: "Onboarding", lvl: "B1+", en: "Let me set the agenda for today.", uk: "Дай мені окреслити порядок денний.", ctx: "Контролювати hosting мітингу", ex: "Let me set the agenda for today — 5 mins on intros, 20 on goals, 10 on next steps." },
+  { id: 499, cat: "Onboarding", lvl: "B1+", en: "Here's how I typically work.", uk: "Ось як я зазвичай працюю.", ctx: "Описати свої процеси і ритм", ex: "Here's how I typically work — weekly check-ins, monthly reports, ad hoc Slack for urgent stuff." },
+  { id: 500, cat: "Onboarding", lvl: "B2", en: "Let me give you a lay of the land.", uk: "Дай я введу тебе в курс справ.", ctx: "Описати поточний стан речей", ex: "Before we plan, let me give you a lay of the land on the account — three things you should know." },
+  { id: 501, cat: "Onboarding", lvl: "B2", en: "What does your decision-making process look like?", uk: "Як виглядає ваш процес прийняття рішень?", ctx: "Хто і як апрувить", ex: "What does your decision-making process look like — who needs to sign off on budget changes?" },
+  { id: 502, cat: "Onboarding", lvl: "B2", en: "I want to set us up for success from day one.", uk: "Хочу налаштувати нас на успіх з першого дня.", ctx: "Заклик до правильної підготовки", ex: "I want to set us up for success from day one — let's make sure tracking is bulletproof before we launch." },
+  { id: 503, cat: "Onboarding", lvl: "B2", en: "How hands-on / hands-off do you want to be?", uk: "Наскільки активно ти хочеш бути залученим?", ctx: "Узгодити рівень взаємодії", ex: "Some clients want daily updates, others monthly — how hands-on/hands-off do you want to be?" },
+
+  // ====== CREATIVE & COPY ======
+  { id: 520, cat: "Creative", lvl: "B2", en: "What's the messaging hierarchy?", uk: "Яка ієрархія повідомлень?", ctx: "Що головне, що другорядне у комунікації", ex: "What's the messaging hierarchy — is price or quality the lead?" },
+  { id: 521, cat: "Creative", lvl: "B2", en: "Tone of voice / brand voice", uk: "Тон комунікації / голос бренду", ctx: "Як бренд звучить — friendly, formal, playful", ex: "Let's stay consistent with your brand voice — playful but informative." },
+  { id: 522, cat: "Creative", lvl: "B2", en: "It feels off-brand.", uk: "Це не пасує до бренду.", ctx: "Не відповідає brand guidelines", ex: "The new ad feels off-brand — too aggressive for your usual tone." },
+  { id: 523, cat: "Creative", lvl: "B1+", en: "On-brand / off-brand", uk: "В стилі бренду / поза стилем", ctx: "Класичний creative-feedback", ex: "Variant A is more on-brand. Variant B is bolder but might alienate the core audience." },
+  { id: 524, cat: "Creative", lvl: "B2", en: "Hook / headline / CTA / supporting copy", uk: "Зачепка / заголовок / заклик / основний текст", ctx: "Структура копірайту", ex: "The hook is strong but the CTA is weak — let's tighten 'Learn more' to 'Get a free quote'." },
+  { id: 525, cat: "Creative", lvl: "B2", en: "It's not landing.", uk: "Це не 'заходить' / не резонує.", ctx: "Аудиторія не реагує", ex: "The first headline isn't landing — CTR is half what variant B is doing." },
+  { id: 526, cat: "Creative", lvl: "B2", en: "Resonates with the target audience", uk: "Резонує з цільовою аудиторією", ctx: "Аудиторія відчуває емоційний зв'язок", ex: "The story angle resonates with the target audience — much higher engagement." },
+  { id: 527, cat: "Creative", lvl: "B2", en: "Let's punch it up.", uk: "Давай зробимо це більш яскравим.", ctx: "Зробити сміливіше / емоційніше", ex: "The headline is too plain — let's punch it up with stronger verbs." },
+  { id: 528, cat: "Creative", lvl: "B2", en: "Let's tone it down.", uk: "Давай знизимо тон.", ctx: "Зробити менш агресивно/гучно", ex: "The CTA feels pushy — let's tone it down a notch." },
+  { id: 529, cat: "Creative", lvl: "B2", en: "Refresh the creative.", uk: "Оновити креатив.", ctx: "Оновити банери / тексти / відео", ex: "Performance is tapering — time to refresh the creative." },
+  { id: 530, cat: "Creative", lvl: "B2", en: "Creative fatigue", uk: "Втома від креативу — аудиторія його перевиділа", ctx: "Коли той самий креатив виснажився", ex: "Frequency is over 8 — classic creative fatigue. We need new variants." },
+  { id: 531, cat: "Creative", lvl: "B2", en: "Let me give you my two cents on this.", uk: "Дай я скажу свою думку по цьому.", ctx: "Скромно ввести своє think", ex: "Let me give you my two cents — variant C feels generic, A and B are stronger." },
+  { id: 532, cat: "Creative", lvl: "B2", en: "It hits the brief.", uk: "Це відповідає брифу.", ctx: "Виконує поставлені вимоги", ex: "Variant B hits the brief perfectly — clear value prop, strong CTA, on-brand." },
+  { id: 533, cat: "Creative", lvl: "B2", en: "Iterate on the creative.", uk: "Доопрацювати креатив.", ctx: "Кілька раундів покращень", ex: "We'll iterate on the creative based on early performance signals." },
+  { id: 534, cat: "Creative", lvl: "B2", en: "Make it pop.", uk: "Зробити щоб виділялось.", ctx: "Більш помітно / яскраво", ex: "The visual is fine, but make the CTA pop — it's getting lost." },
+
+  // ====== CRISIS MANAGEMENT ======
+  { id: 555, cat: "Crisis", lvl: "B2", en: "We've got a situation.", uk: "У нас тут проблема.", ctx: "Серйозне попередження клієнта", ex: "Hi Mark — we've got a situation. The Google Ads account just got suspended." },
+  { id: 556, cat: "Crisis", lvl: "B1+", en: "We're treating this as priority one.", uk: "Це наш пріоритет номер один.", ctx: "Підкреслити терміновість", ex: "We're treating this as priority one — everyone's heads-down on the fix." },
+  { id: 557, cat: "Crisis", lvl: "B2", en: "All hands on deck.", uk: "Всі сили на цьому.", ctx: "Уся команда мобілізована", ex: "Tracking pixel is broken — all hands on deck until it's fixed." },
+  { id: 558, cat: "Crisis", lvl: "B2", en: "Containment first, then root cause.", uk: "Спочатку зупинити, потім розбиратись.", ctx: "Стандартний crisis response", ex: "Containment first, then root cause — let's pause spend before we investigate." },
+  { id: 559, cat: "Crisis", lvl: "B2", en: "We've identified the root cause.", uk: "Ми визначили першопричину.", ctx: "Знайшли звідки проблема", ex: "Update — we've identified the root cause: a duplicate UTM tag." },
+  { id: 560, cat: "Crisis", lvl: "B1+", en: "We've rolled back the change.", uk: "Ми відкотили зміни.", ctx: "Повернули до попередньої робочої версії", ex: "We've rolled back the change — performance should normalise within an hour." },
+  { id: 561, cat: "Crisis", lvl: "B2", en: "Damage control mode.", uk: "Режим обмеження збитків.", ctx: "Мінімізувати наслідки кризи", ex: "We're in damage control mode — paused all paid spend until we know what's happening." },
+  { id: 562, cat: "Crisis", lvl: "B2", en: "I'll keep you posted in real time.", uk: "Буду тримати в курсі в реальному часі.", ctx: "Постійні апдейти під час кризи", ex: "I'll keep you posted in real time — Slack me with any concerns as we work through this." },
+  { id: 563, cat: "Crisis", lvl: "B2", en: "We're on top of it.", uk: "Ми тримаємо це під контролем.", ctx: "Заспокоїти клієнта", ex: "We're on top of it — fix should be live within the hour." },
+  { id: 564, cat: "Crisis", lvl: "B2", en: "Worst case / best case scenario", uk: "Гірший / кращий сценарій", ctx: "Описати діапазон можливих наслідків", ex: "Worst case: we lose 3 days of spend. Best case: it's resolved in an hour." },
+  { id: 565, cat: "Crisis", lvl: "B2", en: "We've got eyes on it.", uk: "Ми це моніторимо.", ctx: "Команда стежить за ситуацією", ex: "We've got eyes on it — alerts are set up if it spikes again." },
+  { id: 566, cat: "Crisis", lvl: "B2", en: "Once the dust settles, let's debrief.", uk: "Коли пил осяде, проведемо розбір.", ctx: "Аналіз після завершення кризи", ex: "Once the dust settles, let's debrief and figure out how to prevent this." },
+  { id: 567, cat: "Crisis", lvl: "B2", en: "Mitigate the impact", uk: "Зменшити вплив (на бізнес)", ctx: "Зробити так щоб збитки були меншими", ex: "We've paused spend to mitigate the impact while we troubleshoot." },
+  { id: 568, cat: "Crisis", lvl: "B2", en: "Stand-by alert / heads-up", uk: "Попередження / готовність", ctx: "Попередити що щось може статись", ex: "Heads-up — Google's reviewing our account, might need your help if they request docs." },
+
+  // ====== TIME & SCHEDULING ======
+  { id: 580, cat: "Scheduling", lvl: "B1", en: "Does Tuesday work for you?", uk: "Вівторок підходить?", ctx: "Стандартне питання при пошуку часу", ex: "Does Tuesday at 2pm work for you?" },
+  { id: 581, cat: "Scheduling", lvl: "B1+", en: "What's your availability this week?", uk: "Коли ти доступний цього тижня?", ctx: "Запитати про вільні слоти", ex: "What's your availability this week for a 30-min sync?" },
+  { id: 582, cat: "Scheduling", lvl: "B1+", en: "I have a hard stop at 4pm.", uk: "У мене жорсткий стоп о 16:00.", ctx: "Не зможу затриматись після", ex: "Heads-up, I have a hard stop at 4 — let's prioritise the must-haves." },
+  { id: 583, cat: "Scheduling", lvl: "B2", en: "Let's keep it to 30 minutes.", uk: "Тримаємось у 30 хвилин.", ctx: "Обмежити тривалість мітингу", ex: "Let's keep it to 30 minutes — I have back-to-backs after." },
+  { id: 584, cat: "Scheduling", lvl: "B2", en: "I'm back-to-back today.", uk: "Сьогодні мітинги один за одним.", ctx: "Дуже завантажений день", ex: "I'm back-to-back today — Slack is faster than email." },
+  { id: 585, cat: "Scheduling", lvl: "B2", en: "Let me check my calendar.", uk: "Дай я гляну свій календар.", ctx: "Перед погодженням часу", ex: "Let me check my calendar — I'll send three options by EOD." },
+  { id: 586, cat: "Scheduling", lvl: "B1+", en: "I'll send a calendar invite.", uk: "Я надішлю календарне запрошення.", ctx: "Підтвердити мітинг через календар", ex: "Sounds good — I'll send a calendar invite for Thursday at 2." },
+  { id: 587, cat: "Scheduling", lvl: "B1+", en: "Can we push this back?", uk: "Можемо перенести на пізніше?", ctx: "Запитати про відстрочення", ex: "Sorry, conflict came up — can we push this back to Friday?" },
+  { id: 588, cat: "Scheduling", lvl: "B2", en: "Can we move this up?", uk: "Можемо перенести на раніше?", ctx: "На раніший час, не пізніший", ex: "If you have time today — can we move this up? I'd love to discuss before the Q3 plan goes out." },
+  { id: 589, cat: "Scheduling", lvl: "B1+", en: "I'll need to reschedule.", uk: "Мені треба буде перенести.", ctx: "Скасувати + запропонувати інший час", ex: "Sorry, something urgent came up — I'll need to reschedule. Free Wednesday or Thursday?" },
+  { id: 590, cat: "Scheduling", lvl: "B2", en: "Let's pencil it in for Wednesday.", uk: "Поставимо попередньо на середу.", ctx: "Тимчасово зарезервувати з можливістю змінити", ex: "Let's pencil it in for Wednesday — I'll confirm by Tuesday morning." },
+  { id: 591, cat: "Scheduling", lvl: "B2", en: "I'm on PTO next week.", uk: "Я у відпустці наступного тижня.", ctx: "PTO = Paid Time Off — стандарт США", ex: "Heads-up, I'm on PTO next week — Sarah will cover anything urgent." },
+  { id: 592, cat: "Scheduling", lvl: "B2", en: "OOO (out of office)", uk: "Поза офісом / недоступний", ctx: "Скорочення в email auto-replies", ex: "I'll be OOO Friday — please ping Sarah for anything time-sensitive." },
+  { id: 593, cat: "Scheduling", lvl: "B2", en: "What time zone are you in?", uk: "В якому ти часовому поясі?", ctx: "Базове питання для глобальних команд", ex: "Quick check — what time zone are you in? I'm working from EST." },
+  { id: 594, cat: "Scheduling", lvl: "B1+", en: "Mind your local time.", uk: "Зважай на свій місцевий час.", ctx: "Уточнення про часовий пояс", ex: "Sending the invite for 9am — mind your local time, I see you're in AEST." },
+  { id: 595, cat: "Scheduling", lvl: "B2", en: "Let's find a time that works for both.", uk: "Знайдімо час що підходить обом.", ctx: "Узгодження часу між поясами", ex: "Tricky with the time zone gap — let's find a time that works for both." },
+  { id: 596, cat: "Scheduling", lvl: "B1+", en: "I'll have to push this to next week.", uk: "Доведеться перенести на наступний тиждень.", ctx: "Не вистачить часу цього тижня", ex: "Three projects landed today — I'll have to push this to next week, sorry!" },
+  { id: 597, cat: "Scheduling", lvl: "B2", en: "Block 30 minutes on my calendar.", uk: "Заблокуй 30 хв у моєму календарі.", ctx: "Зарезервувати слот", ex: "I'll block 30 minutes on my calendar Friday for the deep dive." },
+
+  // ====== CONFIRMATIONS / QUICK ACKNOWLEDGMENTS ======
+  { id: 605, cat: "Confirmations", lvl: "B1", en: "Got it.", uk: "Зрозуміла.", ctx: "Найкоротше підтвердження", ex: "Got it — adding the negative now." },
+  { id: 606, cat: "Confirmations", lvl: "B1", en: "Will do.", uk: "Зроблю.", ctx: "Підтвердження дії", ex: "Will do — sending the report by EOD." },
+  { id: 607, cat: "Confirmations", lvl: "B1", en: "On it.", uk: "Вже працюю над цим.", ctx: "Активне підтвердження — у процесі", ex: "On it — give me 15 minutes." },
+  { id: 608, cat: "Confirmations", lvl: "B1", en: "Sounds good.", uk: "Звучить добре.", ctx: "Згода з пропозицією", ex: "Sounds good — let's do Wednesday at 2." },
+  { id: 609, cat: "Confirmations", lvl: "B1", en: "Makes sense.", uk: "Логічно.", ctx: "Підтвердити що зрозуміла і згодна", ex: "Makes sense — let's go with that approach." },
+  { id: 610, cat: "Confirmations", lvl: "B1+", en: "Roger that. / 10-4.", uk: "Прийнято. / Ок.", ctx: "Військовий стиль — для casual чатів", ex: "Roger that — pulling the data now." },
+  { id: 611, cat: "Confirmations", lvl: "B1+", en: "Copy that.", uk: "Прийнято. / Зрозумів.", ctx: "Більш професійно ніж 'roger that'", ex: "Copy that — will update the campaign accordingly." },
+  { id: 612, cat: "Confirmations", lvl: "B1+", en: "Acknowledged.", uk: "Підтверджено.", ctx: "Дуже формально", ex: "Acknowledged — I'll wait for your sign-off before launching." },
+  { id: 613, cat: "Confirmations", lvl: "B1", en: "Crystal clear.", uk: "Кришталево чисто. / Зрозуміло.", ctx: "Підтвердити повне розуміння", ex: "Crystal clear — running point on this myself." },
+  { id: 614, cat: "Confirmations", lvl: "B1+", en: "Loud and clear.", uk: "Чітко і ясно.", ctx: "Альтернатива 'crystal clear'", ex: "Loud and clear — pausing the campaigns now." },
+  { id: 615, cat: "Confirmations", lvl: "B2", en: "Consider it done.", uk: "Вважай вже зробленим.", ctx: "Сильне зобов'язання", ex: "Consider it done — sending the report tonight." },
+  { id: 616, cat: "Confirmations", lvl: "B1", en: "Noted.", uk: "Прийняла до уваги.", ctx: "Базове ділове підтвердження", ex: "Noted — will adjust the strategy accordingly." },
+  { id: 617, cat: "Confirmations", lvl: "B2", en: "Understood, leaving it with you.", uk: "Зрозуміла, передаю тобі.", ctx: "Завершити thread — передати ініціативу", ex: "Understood, leaving it with you — let me know once you've decided." },
+  { id: 618, cat: "Confirmations", lvl: "B1+", en: "All good on my end.", uk: "З мого боку все добре.", ctx: "Підтвердити що твоя частина готова", ex: "All good on my end — waiting on dev to push the change." },
+
+  // ====== TECH & TOOLS TALK ======
+  { id: 625, cat: "Tech talk", lvl: "B2", en: "Tracking is broken / firing / not firing.", uk: "Трекінг не працює / спрацьовує / не спрацьовує", ctx: "Стандартний marketing-tech словник", ex: "Tracking pixel isn't firing on the thank-you page — investigating." },
+  { id: 626, cat: "Tech talk", lvl: "B2", en: "Push the change to production.", uk: "Залити зміни в production.", ctx: "Виносити в живе середовище", ex: "Once QA signs off, we'll push the change to production." },
+  { id: 627, cat: "Tech talk", lvl: "B2", en: "Roll back to the previous version.", uk: "Відкотити до попередньої версії.", ctx: "Coли нова версія зламала щось", ex: "Let's roll back to the previous version — too many issues with the new tag." },
+  { id: 628, cat: "Tech talk", lvl: "B2", en: "Stage / staging environment", uk: "Тестове середовище — перед prod", ctx: "Тестова версія сайту/системи", ex: "I'll set up the test on staging first before we touch the live site." },
+  { id: 629, cat: "Tech talk", lvl: "B2", en: "Plug-and-play / out-of-the-box", uk: "Готове рішення — встав і працює", ctx: "Просте встановлення без налаштувань", ex: "GA4 isn't quite plug-and-play — it needs configuration to work properly." },
+  { id: 630, cat: "Tech talk", lvl: "B2", en: "Workaround", uk: "Обхідне рішення", ctx: "Не ідеальний фікс, але працює", ex: "There's no clean fix yet — but I have a workaround that gets us 90% of the way." },
+  { id: 631, cat: "Tech talk", lvl: "B2", en: "Edge case", uk: "Крайній випадок", ctx: "Рідкісна ситуація що ламає систему", ex: "It works in 95% of cases — but there's an edge case with safari mobile we need to handle." },
+  { id: 632, cat: "Tech talk", lvl: "B1+", en: "Spin up (a campaign / a project / an environment)", uk: "Запустити / розгорнути швидко", ctx: "Швидко налаштувати щось нове", ex: "Let me spin up a test campaign by Friday — small budget, fast learnings." },
+  { id: 633, cat: "Tech talk", lvl: "B2", en: "API integration / API call", uk: "Інтеграція через API / запит до API", ctx: "Стандартна tech vocab", ex: "We'll need an API integration with your CRM to pull conversion data automatically." },
+  { id: 634, cat: "Tech talk", lvl: "B2", en: "Bandwidth (capacity)", uk: "Bandwidth — тут: пропускна здатність / час", ctx: "Чи є час/ресурси на щось", ex: "Do you have bandwidth this week to review the creative brief?" },
+  { id: 635, cat: "Tech talk", lvl: "B2", en: "Future-proof (this approach)", uk: "Зробити стійким до майбутнього", ctx: "Спроектувати щоб не довелось переробляти", ex: "Let's future-proof the tracking setup — switch to GA4 now before we're forced to." },
+  { id: 636, cat: "Tech talk", lvl: "B2", en: "Source of truth (system of record)", uk: "Джерело правди — авторитетна система", ctx: "Яка система є основною для даних", ex: "Salesforce is your source of truth for revenue — let's reconcile our reports against it." },
+  { id: 637, cat: "Tech talk", lvl: "B2", en: "Permissions / access controls", uk: "Дозволи / контроль доступу", ctx: "Хто що може бачити/міняти", ex: "I don't have edit access to the property — can you adjust permissions?" },
+  { id: 638, cat: "Tech talk", lvl: "B2", en: "Bug / glitch / hiccup", uk: "Баг / збій / тимчасова проблема", ctx: "Bug = повторюваний; glitch = дрібний; hiccup = разовий", ex: "Just a hiccup with the API yesterday — back to normal now." },
+  { id: 639, cat: "Tech talk", lvl: "B2", en: "Latency", uk: "Затримка — у відповіді системи / даних", ctx: "Time delay для tech systems", ex: "There's some latency between Google Ads and BigQuery — data is usually 4 hours behind." },
+
+  // ====== DIFFICULT CONVERSATIONS ======
+  { id: 660, cat: "Difficult talks", lvl: "B2", en: "I want to be candid with you.", uk: "Хочу бути відверта з тобою.", ctx: "Перед чесним складним повідомленням", ex: "I want to be candid with you — at this rate, we won't hit the Q3 target." },
+  { id: 661, cat: "Difficult talks", lvl: "B2", en: "Let me be direct.", uk: "Дай я скажу прямо.", ctx: "Без 'обгорток' — прямо до суті", ex: "Let me be direct — the current strategy isn't working." },
+  { id: 662, cat: "Difficult talks", lvl: "B2", en: "I'm going to push back on that.", uk: "Я з цим не погоджуся.", ctx: "Підготовка до незгоди", ex: "I'm going to push back on that — we don't have data to support that decision." },
+  { id: 663, cat: "Difficult talks", lvl: "B2", en: "I have to flag a concern.", uk: "Мушу попередити про побоювання.", ctx: "Формально звернути увагу на проблему", ex: "I have to flag a concern — moving budget that fast usually backfires." },
+  { id: 664, cat: "Difficult talks", lvl: "B2", en: "This isn't sustainable.", uk: "Це не може довго так тривати.", ctx: "Поточний стан небезпечний у довгу", ex: "Burning through budget at this CPA isn't sustainable — we need to recalibrate." },
+  { id: 665, cat: "Difficult talks", lvl: "B2", en: "I want to be transparent with you.", uk: "Хочу бути прозорою з тобою.", ctx: "Чесний апдейт навіть якщо неприємно", ex: "I want to be transparent with you — we likely won't hit our Q1 numbers." },
+  { id: 666, cat: "Difficult talks", lvl: "B2", en: "Let's address the elephant in the room.", uk: "Давай поговоримо про слона у кімнаті.", ctx: "Підняти незручну тему якої уникали", ex: "Before we keep planning — let's address the elephant in the room: the tracking issue." },
+  { id: 667, cat: "Difficult talks", lvl: "B2", en: "I don't want to sugarcoat this.", uk: "Не хочу прикрашати це.", ctx: "Готовність сказати неприємну правду", ex: "I don't want to sugarcoat this — performance is below where it should be." },
+  { id: 668, cat: "Difficult talks", lvl: "B2", en: "We need to have a tough conversation.", uk: "Маємо провести важку розмову.", ctx: "Сигнал що тема серйозна", ex: "Hi Mark, can we hop on a call? We need to have a tough conversation about the contract." },
+  { id: 669, cat: "Difficult talks", lvl: "B2", en: "I owe it to you to be honest about…", uk: "Я зобов'язана бути чесною про…", ctx: "Підкреслити моральне зобов'язання", ex: "I owe it to you to be honest about what's realistic in this timeframe." },
+  { id: 670, cat: "Difficult talks", lvl: "B2", en: "Saying no is the right call here.", uk: "Сказати 'ні' — правильне рішення.", ctx: "Обґрунтувати відмову", ex: "I know it's tempting, but saying no is the right call here — the data isn't there yet." },
+  { id: 671, cat: "Difficult talks", lvl: "B2", en: "I have to draw the line at…", uk: "Я повинна провести межу на…", ctx: "Чітка межа — далі не йду", ex: "I have to draw the line at running ads without proper disclaimers — that's a legal risk." },
+  { id: 672, cat: "Difficult talks", lvl: "B2", en: "Let's have an honest conversation about expectations.", uk: "Давай чесно поговоримо про очікування.", ctx: "Перепогодити що реалістично", ex: "Let's have an honest conversation about expectations — given current spend, 5x ROAS isn't realistic." },
+  { id: 673, cat: "Difficult talks", lvl: "B2", en: "I want to address something directly.", uk: "Хочу зачепити дещо прямо.", ctx: "Перед серйозною темою", ex: "Before we get into the agenda — I want to address something directly about last week's miss." },
+
+  // ====== ACCOUNT GROWTH / RETENTION ======
+  { id: 690, cat: "Growth & retention", lvl: "B2", en: "Quarterly business review (QBR)", uk: "Квартальний бізнес-огляд", ctx: "Стандартна B2B практика", ex: "Let's set up a QBR for early July to review Q2 and plan Q3." },
+  { id: 691, cat: "Growth & retention", lvl: "B2", en: "Show value / demonstrate impact", uk: "Показати цінність / довести вплив", ctx: "Підтвердити що інвестиція виправдана", ex: "The QBR is your chance to show value — focus on revenue impact, not vanity metrics." },
+  { id: 692, cat: "Growth & retention", lvl: "B2", en: "Renewal conversation", uk: "Розмова про продовження", ctx: "Перед закінченням контракту", ex: "Renewal conversation is in 6 weeks — let's make sure the data tells a strong story." },
+  { id: 693, cat: "Growth & retention", lvl: "B2", en: "Upsell / cross-sell", uk: "Допродаж дорожчого / суміжного продукту", ctx: "Продаж клієнту більше", ex: "Now that Search is dialed in, there's a natural upsell opportunity — YouTube." },
+  { id: 694, cat: "Growth & retention", lvl: "B2", en: "Land and expand", uk: "Зайти і розширюватись", ctx: "Стратегія: маленький контракт → великий", ex: "We landed on Search — now let's expand into Display and YouTube." },
+  { id: 695, cat: "Growth & retention", lvl: "B2", en: "Build a strong case for…", uk: "Збудувати сильну аргументацію для…", ctx: "Готувати презентацію з фактами", ex: "Let's build a strong case for the budget increase — three case studies, two charts, one ask." },
+  { id: 696, cat: "Growth & retention", lvl: "B2", en: "Make the business case for X", uk: "Зробити бізнес-кейс для X", ctx: "Обґрунтувати цифрами", ex: "I'll make the business case for adding YouTube — projected ROI and risk analysis." },
+  { id: 697, cat: "Growth & retention", lvl: "B2", en: "Customer lifetime value (LTV)", uk: "Цінність клієнта за весь час", ctx: "Скільки приносить клієнт за роки", ex: "We need to think LTV, not just first purchase — that changes our acceptable CPA." },
+  { id: 698, cat: "Growth & retention", lvl: "B2", en: "Retention is cheaper than acquisition.", uk: "Утримання дешевше ніж залучення.", ctx: "Класична маркетингова мудрість", ex: "Retention is cheaper than acquisition — let's make sure we're nurturing existing customers." },
+  { id: 699, cat: "Growth & retention", lvl: "B2", en: "Churn risk", uk: "Ризик відтоку (клієнтів)", ctx: "Хто може піти", ex: "I'm seeing churn risk signals — engagement is dropping for the past 3 months." },
+  { id: 700, cat: "Growth & retention", lvl: "B2", en: "Stickiness (of a product / a relationship)", uk: "Прив'язаність / стійкість стосунків", ctx: "Як міцно клієнт прив'язаний", ex: "The integration improves stickiness — once it's set up, switching is painful." },
+  { id: 701, cat: "Growth & retention", lvl: "B2", en: "Strategic partner vs vendor", uk: "Стратегічний партнер vs постачальник", ctx: "Тип стосунків — глибший vs поверхневий", ex: "We want to be a strategic partner, not just a vendor — that's why we're proactive on insights." },
+
+  // ====== COMPETITOR & MARKET TALK ======
+  { id: 720, cat: "Competitors", lvl: "B2", en: "Auction insights", uk: "Аналіз аукціону (Google Ads звіт)", ctx: "Хто з ким конкурує в Google Ads", ex: "Looking at auction insights, Competitor X is showing 60% overlap with us." },
+  { id: 721, cat: "Competitors", lvl: "B2", en: "Competitive landscape", uk: "Конкурентна картина", ctx: "Загальний огляд ринку", ex: "Let me give you a snapshot of the competitive landscape before we plan messaging." },
+  { id: 722, cat: "Competitors", lvl: "B2", en: "Outranked by competitor X", uk: "Конкурент X випереджає нас в ранжуванні", ctx: "Класична метрика SEO/Search Ads", ex: "We're getting outranked by Competitor X on the top 5 commercial keywords." },
+  { id: 723, cat: "Competitors", lvl: "B2", en: "Top-of-funnel (TOFU) / Mid-funnel (MOFU) / Bottom-of-funnel (BOFU)", uk: "Верх / середина / низ воронки", ctx: "Стандартна marketer термінологія", ex: "We're strong on BOFU but weak on TOFU — that's why volume is capped." },
+  { id: 724, cat: "Competitors", lvl: "B2", en: "Share of voice (SOV)", uk: "Частка голосу — % від загальних показів", ctx: "Скільки нас бачать порівняно з ринком", ex: "Our SOV is 18% in the category — leader is at 32%." },
+  { id: 725, cat: "Competitors", lvl: "B2", en: "Differentiate from competitors / stand out", uk: "Відрізнятись від конкурентів / виділятись", ctx: "Бути іншим — і помітним", ex: "We need to differentiate from competitors with a clearer value prop." },
+  { id: 726, cat: "Competitors", lvl: "B2", en: "Race to the bottom (on price)", uk: "Гонка на дно — змагання у зниженні цін", ctx: "Шкідлива конкуренція тільки за ціною", ex: "Let's avoid a race to the bottom on price — compete on value instead." },
+  { id: 727, cat: "Competitors", lvl: "B2", en: "Category leader / category creator", uk: "Лідер категорії / творець категорії", ctx: "Хто домінує / хто створив нішу", ex: "We're the category creator — competitors are following our playbook." },
+  { id: 728, cat: "Competitors", lvl: "B2", en: "Market share", uk: "Частка ринку", ctx: "Базовий бізнес термін", ex: "Our market share grew from 12% to 17% YoY." },
+
+  // ====== AUDIENCE / TARGETING ======
+  { id: 740, cat: "Audience", lvl: "B2", en: "Target audience / target persona", uk: "Цільова аудиторія / персона", ctx: "Кому ми робимо рекламу", ex: "Let's nail down the target persona before we write copy." },
+  { id: 741, cat: "Audience", lvl: "B2", en: "Buyer persona / ideal customer profile (ICP)", uk: "Персона покупця / ідеальний клієнт", ctx: "Дуже детальний портрет аудиторії", ex: "Our ICP is mid-market SaaS — 50–500 employees, $5–50M ARR." },
+  { id: 742, cat: "Audience", lvl: "B2", en: "Lookalike audience (LAL)", uk: "Lookalike — аудиторія схожа на клієнтів", ctx: "Facebook/Google feature", ex: "Let's build a 1% lookalike from our top 10% LTV customers." },
+  { id: 743, cat: "Audience", lvl: "B2", en: "Audience overlap / cannibalisation", uk: "Перекриття аудиторій / канібалізація", ctx: "Дві кампанії конкурують за тих самих", ex: "There's heavy audience overlap between Display and Discovery — we're paying twice." },
+  { id: 744, cat: "Audience", lvl: "B2", en: "Segment / segmentation", uk: "Сегмент / сегментація", ctx: "Розділити аудиторію за критеріями", ex: "Segmentation by intent — high vs low — lets us spend differently." },
+  { id: 745, cat: "Audience", lvl: "B2", en: "Hot / warm / cold audience", uk: "Гаряча / тепла / холодна аудиторія", ctx: "За готовністю до покупки", ex: "Cold audiences need awareness creative — hot audiences need direct CTAs." },
+  { id: 746, cat: "Audience", lvl: "B2", en: "Retargeting / remarketing", uk: "Ретаргетинг — реклама на тих, хто вже взаємодіяв", ctx: "Базова PPC техніка", ex: "Retargeting cart abandoners is 4x more efficient than cold prospecting." },
+  { id: 747, cat: "Audience", lvl: "B2", en: "First-party data / third-party data", uk: "Дані 1-ї сторони / 3-ї сторони", ctx: "Свої дані vs куплені у брокерів", ex: "Post-cookie world is all about first-party data — let's prioritize email list growth." },
+  { id: 748, cat: "Audience", lvl: "B2", en: "Suppression list / exclusion list", uk: "Список виключень — кому НЕ показувати", ctx: "Прибрати поточних клієнтів від реклами", ex: "Add existing customers to the suppression list so we don't waste budget on them." },
+  { id: 749, cat: "Audience", lvl: "B2", en: "High-intent / low-intent traffic", uk: "Високої / низької наміру трафік", ctx: "Готовність купити", ex: "High-intent keywords convert at 8%; low-intent at 1.5% — different bidding strategies." },
+
+  // ====== TESTING LANGUAGE ======
+  { id: 760, cat: "Testing", lvl: "B1+", en: "A/B test / split test", uk: "A/B тест", ctx: "Базовий experimental setup", ex: "We'll A/B test three headlines for two weeks." },
+  { id: 761, cat: "Testing", lvl: "B2", en: "Control vs variant / variant A / variant B", uk: "Контроль vs варіант / варіант A / B", ctx: "Структура експерименту", ex: "Variant B beat the control by 18% — let's promote it." },
+  { id: 762, cat: "Testing", lvl: "B2", en: "Statistical significance / 95% confidence", uk: "Статистична значущість / 95% довіра", ctx: "Чи результат не випадковий", ex: "We need at least 95% confidence before declaring a winner." },
+  { id: 763, cat: "Testing", lvl: "B2", en: "Sample size / sample size calculator", uk: "Розмір вибірки / калькулятор", ctx: "Скільки даних треба для висновку", ex: "Run the sample size calculator first — otherwise we're testing on noise." },
+  { id: 764, cat: "Testing", lvl: "B2", en: "Holdout group", uk: "Контрольна група без впливу", ctx: "Не показувати рекламу — для incrementality", ex: "We'll keep a 10% holdout group to measure true incrementality." },
+  { id: 765, cat: "Testing", lvl: "B2", en: "Incrementality testing", uk: "Тест на додатковість", ctx: "Чи реклама дала додаткові продажі", ex: "Brand campaigns need incrementality testing — we suspect a lot would have converted anyway." },
+  { id: 766, cat: "Testing", lvl: "B2", en: "Test cycle / iteration cycle", uk: "Цикл тестування / ітерацій", ctx: "Регулярний ритм експериментів", ex: "We're on a 2-week test cycle — Monday launch, Friday review." },
+  { id: 767, cat: "Testing", lvl: "B2", en: "Confounding variables", uk: "Сторонні змінні що ламають експеримент", ctx: "Не контрольовані фактори", ex: "Tough to isolate the impact — there are too many confounding variables this month." },
+  { id: 768, cat: "Testing", lvl: "B2", en: "Read out results / readout", uk: "Звіт / винесення результатів", ctx: "Презентація результатів тесту", ex: "We'll read out results next Friday — clean recap of what worked." },
+  { id: 769, cat: "Testing", lvl: "B2", en: "Run a pilot / pilot test", uk: "Провести пілот / пілотний тест", ctx: "Маленький тест перед повним розгортанням", ex: "Let's run a pilot in two markets first — then expand if it proves out." },
+  { id: 770, cat: "Testing", lvl: "B2", en: "Promote the winner / kill the loser", uk: "Розгорнути переможця / закрити невдаху", ctx: "Стандартний flow після тесту", ex: "Pretty clear test — let's promote the winner and kill the loser by end of week." },
+
+  // ====== MORE PHRASAL VERBS ======
+  { id: 780, cat: "Phrasal verbs", lvl: "B2", en: "act on (information / feedback)", uk: "діяти на основі інфи / фідбеку", ctx: "Не тільки отримати, а й зреагувати", ex: "Thanks for the feedback — I'll act on it this week." },
+  { id: 781, cat: "Phrasal verbs", lvl: "B2", en: "bank on (something)", uk: "розраховувати на щось", ctx: "Сильна впевненість у результаті", ex: "Don't bank on PMax delivering before week 3 — it always needs ramp time." },
+  { id: 782, cat: "Phrasal verbs", lvl: "B2", en: "bear out (a hypothesis)", uk: "підтвердити (гіпотезу)", ctx: "Дані підтверджують припущення", ex: "The data bears out our hypothesis that mobile is the bottleneck." },
+  { id: 783, cat: "Phrasal verbs", lvl: "B2", en: "branch out into (a new channel)", uk: "розширюватись у новий напрямок", ctx: "Виходити в нову сферу", ex: "We're ready to branch out into TikTok — Display is saturated." },
+  { id: 784, cat: "Phrasal verbs", lvl: "B2", en: "break down (analyze in parts)", uk: "розкласти / проаналізувати по частинах", ctx: "Деталізувати щось", ex: "Let me break down the spend by channel so we can see where the leakage is." },
+  { id: 785, cat: "Phrasal verbs", lvl: "B2", en: "bring (something) to the table", uk: "запропонувати / привнести", ctx: "Що ти даєш у партнерство", ex: "What does each agency bring to the table? That's what we should compare." },
+  { id: 786, cat: "Phrasal verbs", lvl: "B1+", en: "catch up (on something)", uk: "наздогнати по якомусь питанню", ctx: "Відновити контекст після паузи", ex: "Let me catch up on the Slack thread before our call." },
+  { id: 787, cat: "Phrasal verbs", lvl: "B2", en: "clear up (a misunderstanding)", uk: "прояснити непорозуміння", ctx: "Виправити сплутаний контекст", ex: "Let me clear up the confusion — we're not pausing Search, just restructuring it." },
+  { id: 788, cat: "Phrasal verbs", lvl: "B2", en: "come down to (something)", uk: "зводитись до чогось", ctx: "У підсумку справа в…", ex: "It comes down to one thing: we don't have enough first-party data." },
+  { id: 789, cat: "Phrasal verbs", lvl: "B2", en: "dial in (a process / a campaign)", uk: "налаштувати / 'довести до досконалості'", ctx: "Виправити дрібниці щоб працювало як годинник", ex: "Once we dial in the bidding strategy, performance should stabilise." },
+  { id: 790, cat: "Phrasal verbs", lvl: "B2", en: "drum up (interest / demand)", uk: "розбурхати інтерес / попит", ctx: "Активно генерувати увагу", ex: "We need to drum up interest before launch — let's seed content 2 weeks early." },
+  { id: 791, cat: "Phrasal verbs", lvl: "B2", en: "factor in (variables)", uk: "врахувати (фактори)", ctx: "Включити в розрахунок", ex: "Factor in seasonality before drawing conclusions from this week's data." },
+  { id: 792, cat: "Phrasal verbs", lvl: "B2", en: "follow through (on a promise)", uk: "довести до кінця (обіцяне)", ctx: "Не просто пообіцяти — виконати", ex: "I'll follow through on the audit by Friday as promised." },
+  { id: 793, cat: "Phrasal verbs", lvl: "B2", en: "gear up for (something)", uk: "готуватись до чогось", ctx: "Активна підготовка", ex: "Let's gear up for Black Friday — creative refresh starts in 3 weeks." },
+  { id: 794, cat: "Phrasal verbs", lvl: "B2", en: "head off (a problem)", uk: "запобігти проблемі / випередити її", ctx: "Зупинити до того як стане великою", ex: "Let's head off any tracking issues before launch — full QA tomorrow." },
+  { id: 795, cat: "Phrasal verbs", lvl: "B2", en: "look into (something)", uk: "дослідити щось", ctx: "Розібратись в питанні", ex: "I'll look into the conversion drop and report back by EOD." },
+  { id: 796, cat: "Phrasal verbs", lvl: "B2", en: "map out (a plan / a strategy)", uk: "розписати план / стратегію", ctx: "Задокументувати кроки", ex: "Let's map out the next 90 days before we get into tactics." },
+  { id: 797, cat: "Phrasal verbs", lvl: "B2", en: "narrow down (options)", uk: "звужувати варіанти", ctx: "Йти від багатьох до кількох", ex: "Let's narrow down the targeting from 50 keywords to the top 10." },
+  { id: 798, cat: "Phrasal verbs", lvl: "B2", en: "pan out", uk: "виявитись (як вийде)", ctx: "Чи спрацює якщо чекати", ex: "Let's see how PMax pans out before we add more budget." },
+  { id: 799, cat: "Phrasal verbs", lvl: "B2", en: "ping (someone)", uk: "пингнути / швидко звернутися", ctx: "Швидке повідомлення в Slack", ex: "Just ping me on Slack if anything urgent comes up." },
+  { id: 800, cat: "Phrasal verbs", lvl: "B2", en: "reach out (to someone)", uk: "звернутись до когось", ctx: "Ініціювати контакт", ex: "I'll reach out to the dev team about the tracking issue." },
+  { id: 801, cat: "Phrasal verbs", lvl: "B2", en: "shake out (results / a process)", uk: "побачити як виглядає в підсумку", ctx: "Як події розгорнуться", ex: "Let's see how Q2 shakes out before deciding on Q3 budget." },
+  { id: 802, cat: "Phrasal verbs", lvl: "B2", en: "stem from (a cause)", uk: "виходити з / походити від", ctx: "Походження проблеми", ex: "The drop stems from a tracking misfire two weeks ago — not actual performance." },
+  { id: 803, cat: "Phrasal verbs", lvl: "B2", en: "take on (a project / responsibility)", uk: "взяти на себе (проект)", ctx: "Прийняти відповідальність", ex: "Happy to take on the email channel as well — feels like a natural fit." },
+  { id: 804, cat: "Phrasal verbs", lvl: "B2", en: "take it offline", uk: "винести в особисту розмову (поза мітинг)", ctx: "Не обговорювати при всіх", ex: "Good question — let's take it offline so we don't derail the agenda." },
+  { id: 805, cat: "Phrasal verbs", lvl: "B2", en: "throw in (something extra)", uk: "докинути / додати безкоштовно", ctx: "Бонус", ex: "I'll throw in a competitive analysis at no extra cost — useful context for you." },
+  { id: 806, cat: "Phrasal verbs", lvl: "B2", en: "weed out (bad keywords / poor performers)", uk: "виполоти / прибрати погане", ctx: "Зачистити список", ex: "First step is to weed out keywords spending without conversions for 60+ days." },
+  { id: 807, cat: "Phrasal verbs", lvl: "B2", en: "zero in on (the issue)", uk: "зосередитись точно на проблемі", ctx: "Сфокусуватись на головному", ex: "Let's zero in on the issue — Display performance, specifically the prospecting layer." },
+  { id: 808, cat: "Phrasal verbs", lvl: "B2", en: "stack up against (competitors)", uk: "виглядати на фоні (конкурентів)", ctx: "Як ми виглядаємо порівняно", ex: "Let's see how we stack up against competitors on share of voice." },
+  { id: 809, cat: "Phrasal verbs", lvl: "B2", en: "rule (something) out", uk: "виключити (як варіант)", ctx: "Прибрати з розгляду", ex: "We can rule out tracking issues — the data is clean. So it's a real performance drop." },
+
+  // ====== BUSINESS IDIOMS ======
+  { id: 820, cat: "Business idioms", lvl: "B2", en: "The ball is in your court.", uk: "М'яч на твоєму боці — твій хід.", ctx: "Чекаємо на твоє рішення/дію", ex: "I've sent the proposal — the ball is in your court now." },
+  { id: 821, cat: "Business idioms", lvl: "B2", en: "On the back burner", uk: "На задньому плані / відкладено", ctx: "Менш пріоритетне", ex: "YouTube is on the back burner until Search is fully optimised." },
+  { id: 822, cat: "Business idioms", lvl: "B2", en: "A moving target", uk: "Рухома мішень — постійно змінюється", ctx: "Ціль постійно змінюється", ex: "Performance benchmarks are a moving target — we update them quarterly." },
+  { id: 823, cat: "Business idioms", lvl: "B2", en: "Bend over backwards", uk: "Викручуватися / робити надмірні зусилля", ctx: "Старатись з усіх сил для когось", ex: "Sarah bent over backwards to get this approved by Friday — really impressive." },
+  { id: 824, cat: "Business idioms", lvl: "B2", en: "By the book", uk: "За правилами / за книжкою", ctx: "Без обходу процедур", ex: "On legal stuff we go by the book — no shortcuts." },
+  { id: 825, cat: "Business idioms", lvl: "B2", en: "A catch-22", uk: "Замкнуте коло — обидва варіанти погані", ctx: "Парадоксальна ситуація", ex: "It's a catch-22 — we need data to decide, but we need to spend to get data." },
+  { id: 826, cat: "Business idioms", lvl: "B2", en: "Cut corners", uk: "Зрізати кути — економити на якості", ctx: "Робити швидко але неякісно", ex: "Let's not cut corners on QA — that's how we end up with broken tracking." },
+  { id: 827, cat: "Business idioms", lvl: "B2", en: "In the weeds", uk: "У бур'янах — застрягти у дрібницях", ctx: "Втратили загальну картинку", ex: "We're getting in the weeds on bid adjustments — let's zoom out to strategy." },
+  { id: 828, cat: "Business idioms", lvl: "B1+", en: "In the loop / out of the loop", uk: "У курсі / поза курсом справ", ctx: "Чи людина знає що відбувається", ex: "Make sure Mark is in the loop on this — he's the budget owner." },
+  { id: 829, cat: "Business idioms", lvl: "B1+", en: "On the same page", uk: "На одній хвилі / погоджено", ctx: "Спільне розуміння", ex: "Let's make sure we're on the same page before the client call." },
+  { id: 830, cat: "Business idioms", lvl: "B2", en: "Hit the ground running", uk: "Швидко включитись у роботу", ctx: "Без розкачки — одразу до справи", ex: "She's onboarded fast — really hit the ground running this month." },
+  { id: 831, cat: "Business idioms", lvl: "B2", en: "Play it by ear", uk: "Діяти за обставинами / без плану", ctx: "Адаптуватись на ходу", ex: "We don't have firm pricing yet — let's play it by ear on the call." },
+  { id: 832, cat: "Business idioms", lvl: "B2", en: "Raise red flags", uk: "Викликати тривожні сигнали", ctx: "Звернути увагу на проблему", ex: "These conversion numbers raise red flags — let's audit the tracking before reporting." },
+  { id: 833, cat: "Business idioms", lvl: "B2", en: "Read between the lines", uk: "Читати між рядків", ctx: "Зрозуміти неявне", ex: "Reading between the lines — the client is unhappy with the timeline, not the work." },
+  { id: 834, cat: "Business idioms", lvl: "B2", en: "Spread thin", uk: "Розпорошитись / занадто тонко розподілити ресурси", ctx: "Намагатись робити багато і нічого добре", ex: "We're spread thin across 8 channels — let's pick 4 and go deep." },
+  { id: 835, cat: "Business idioms", lvl: "B2", en: "Think outside the box", uk: "Мислити нестандартно", ctx: "Класична ідіома про креативність", ex: "Standard playbooks aren't working — let's think outside the box on creative." },
+  { id: 836, cat: "Business idioms", lvl: "B2", en: "Under the wire", uk: "У останній момент", ctx: "Ледве встигнути в дедлайн", ex: "We made it under the wire — pushed live 30 min before the deadline." },
+  { id: 837, cat: "Business idioms", lvl: "B2", en: "When push comes to shove", uk: "Коли треба буде вирішувати", ctx: "У вирішальний момент", ex: "When push comes to shove, we'll cut Display before we touch Search." },
+  { id: 838, cat: "Business idioms", lvl: "B2", en: "Touch base", uk: "Зв'язатись / звіритись", ctx: "Швидкий контакт-перевірка", ex: "Let's touch base Friday on where we are with the launch." },
+  { id: 839, cat: "Business idioms", lvl: "B2", en: "Get the ball rolling", uk: "Запустити процес", ctx: "Ініціювати рух", ex: "Let me get the ball rolling on the creative brief today." },
+  { id: 840, cat: "Business idioms", lvl: "B2", en: "Up to speed", uk: "В курсі справ / готовий", ctx: "Знає поточний стан", ex: "Sarah is up to speed on the account — she'll cover during my PTO." },
+  { id: 841, cat: "Business idioms", lvl: "B2", en: "A long shot", uk: "Малоймовірний шанс", ctx: "Ризикована ставка", ex: "Hitting 5x ROAS in month one is a long shot — but worth aiming for." },
+  { id: 842, cat: "Business idioms", lvl: "B2", en: "A slam dunk", uk: "Вірний/легкий успіх", ctx: "100% upside, без ризику", ex: "Adding negatives to the broad match campaign is a slam dunk — let's just do it." },
+  { id: 843, cat: "Business idioms", lvl: "B2", en: "Bite the bullet", uk: "Стиснути зуби і зробити неприємне", ctx: "Прийняти важке рішення", ex: "We need to bite the bullet and migrate to GA4 before Universal sunsets." },
+  { id: 844, cat: "Business idioms", lvl: "B2", en: "Change horses midstream", uk: "Міняти план посередині процесу", ctx: "Робити різкий поворот не вчасно", ex: "Let's not change horses midstream — give the new bid strategy 4 weeks to settle." },
+  { id: 845, cat: "Business idioms", lvl: "B2", en: "Break the bank", uk: "Розорити бюджет", ctx: "Дуже дорого", ex: "Adding YouTube doesn't have to break the bank — we can start at $50/day." },
+
+  // ====== CONVERSATION FILLERS / DISCOURSE ======
+  { id: 850, cat: "Fillers & flow", lvl: "B1+", en: "You know what I mean?", uk: "Ти розумієш, про що я?", ctx: "Перевірка розуміння в casual chat", ex: "It's not about the metric itself — it's about the trend, you know what I mean?" },
+  { id: 851, cat: "Fillers & flow", lvl: "B1", en: "Kind of / sort of", uk: "Ніби / типу", ctx: "Пом'якшує твердження", ex: "It's kind of working — but not as fast as we hoped." },
+  { id: 852, cat: "Fillers & flow", lvl: "B1+", en: "Basically,", uk: "В принципі, / По суті,", ctx: "Перед спрощенням пояснення", ex: "Basically, the algorithm needs more conversion data before it stabilises." },
+  { id: 853, cat: "Fillers & flow", lvl: "B1+", en: "Actually,", uk: "Власне, / Насправді,", ctx: "Введення несподіваного факту або корекції", ex: "Actually, that's a great point — let me revise my recommendation." },
+  { id: 854, cat: "Fillers & flow", lvl: "B1+", en: "I mean,", uk: "Я маю на увазі,", ctx: "Перефразування / уточнення", ex: "I mean, the data is decent — just not as strong as I'd like to scale on." },
+  { id: 855, cat: "Fillers & flow", lvl: "B1+", en: "To be honest, / Honestly,", uk: "Чесно кажучи,", ctx: "Перед чесною думкою", ex: "Honestly, I think we should pause Display and put it all into Search." },
+  { id: 856, cat: "Fillers & flow", lvl: "B1+", en: "If I'm being honest,", uk: "Якщо чесно,", ctx: "Перед прямим спостереженням", ex: "If I'm being honest, the brief is too vague — I need more detail." },
+  { id: 857, cat: "Fillers & flow", lvl: "B2", en: "At the end of the day,", uk: "В кінцевому рахунку,", ctx: "Підсумок — що в результаті важливо", ex: "At the end of the day, what matters is profitable revenue — not CTR." },
+  { id: 858, cat: "Fillers & flow", lvl: "B2", en: "When it comes to (X),", uk: "Коли йдеться про (X),", ctx: "Перехід до конкретної теми", ex: "When it comes to attribution, no model is perfect — pick the least wrong one." },
+  { id: 859, cat: "Fillers & flow", lvl: "B2", en: "The way I see it,", uk: "Як я це бачу,", ctx: "Введення особистої точки зору", ex: "The way I see it, we have two paths — incremental or aggressive. Both work." },
+  { id: 860, cat: "Fillers & flow", lvl: "B2", en: "From where I sit,", uk: "З моєї позиції,", ctx: "З мого досвіду", ex: "From where I sit, the issue is creative fatigue — not bidding strategy." },
+  { id: 861, cat: "Fillers & flow", lvl: "B2", en: "All in all,", uk: "В цілому,", ctx: "Загальний підсумок", ex: "All in all, a strong quarter — small misses on Display, big wins on Search." },
+  { id: 862, cat: "Fillers & flow", lvl: "B2", en: "By and large,", uk: "Загалом,", ctx: "В основному (за рідкісними виключеннями)", ex: "By and large, the strategy is working — there are pockets of weakness, but overall trend is positive." },
+  { id: 863, cat: "Fillers & flow", lvl: "B2", en: "As a rule of thumb,", uk: "Як правило (приблизно),", ctx: "Загальне правило з досвіду", ex: "As a rule of thumb, we wait 14 days before judging PMax." },
+  { id: 864, cat: "Fillers & flow", lvl: "B2", en: "Long story short,", uk: "Якщо коротко,", ctx: "Скоротити пояснення", ex: "Long story short — fixed the issue, performance is back to normal." },
+  { id: 865, cat: "Fillers & flow", lvl: "B2", en: "Mind you,", uk: "Зважай / прийми до уваги,", ctx: "Перед важливим уточненням", ex: "Performance is up — mind you, we also doubled the budget." },
+  { id: 866, cat: "Fillers & flow", lvl: "B2", en: "Granted,", uk: "Так, погоджуюсь,", ctx: "Визнати точку перед запереченням", ex: "Granted, the cost per click is high — but conversion rate justifies it." },
+  { id: 867, cat: "Fillers & flow", lvl: "B2", en: "That being said, / With that said,", uk: "Сказавши це,", ctx: "Перехід від загального до контрасту", ex: "Display ROAS is low. With that said, it's playing a real role in upper-funnel." },
+  { id: 868, cat: "Fillers & flow", lvl: "B2", en: "Speaking of which,", uk: "До речі (про це ж),", ctx: "Природний перехід на дотичну тему", ex: "Speaking of which, the YouTube test results came in — pretty interesting." },
+  { id: 869, cat: "Fillers & flow", lvl: "B2", en: "Last but not least,", uk: "Останнє, але не менш важливе,", ctx: "Перед останнім пунктом списку", ex: "Last but not least — let's talk about the renewal in October." },
+];
+
+const DIALOGUES = [
+  {
+    title: "Weekly Status Update",
+    scenario: "Понеділок — клієнт чекає короткий апдейт по кампаніях.",
+    turns: [
+      { who: "you", text: 'Hi Sarah, <span class="hl">hope you had a good weekend</span>! <span class="hl">Quick update</span> on where we are: Search is up 14% on conversions WoW, PMax launched Friday and is still in learning phase, and the feed audit is <span class="hl">in the works</span>.' },
+      { who: "client", text: "Nice — what's the plan for PMax this week?" },
+      { who: "you", text: '<span class="hl">My suggestion would be</span> we let it run another full week before judging anything. <span class="hl">Just to manage expectations</span>, PMax usually needs 14 days minimum to stabilise.' },
+      { who: "client", text: "Got it. What about the Display drop?" },
+      { who: "you", text: '<span class="hl">Based on what I\'m seeing</span>, it\'s mostly an audience overlap issue. <span class="hl">I\'d recommend we</span> tighten the audience exclusions and review next Monday. <span class="hl">Sound good?</span>' }
+    ]
+  },
+  {
+    title: "Reporting a Delay",
+    scenario: "Виявилась проблема з фідом, лонч переноситься на пару днів.",
+    turns: [
+      { who: "you", text: 'Hi Mark — <span class="hl">wanted to give you a heads-up that</span> the Shopping launch will likely slip to Wednesday.' },
+      { who: "client", text: "Oh — what happened?" },
+      { who: "you", text: '<span class="hl">Here\'s what happened, and here\'s how we\'re fixing it</span>: Google flagged 12 products in the feed for missing GTINs. The dev team is updating the feed mapping today. <span class="hl">We\'re already on it</span>.' },
+      { who: "client", text: "Will this affect peak season?" },
+      { who: "you", text: '<span class="hl">Realistically</span>, no — we still have 9 days of buffer before peak. <span class="hl">I\'ll keep you posted</span> as soon as the feed re-approves. <span class="hl">Appreciate your patience on this</span>.' }
+    ]
+  },
+  {
+    title: "Pushing Back on a Bad Idea",
+    scenario: "Клієнт хоче різко скоротити Search бюджет щоб перекинути на Display.",
+    turns: [
+      { who: "client", text: "Let's pull 40% of Search budget into Display next week — Display feels underfunded." },
+      { who: "you", text: '<span class="hl">I see where you\'re coming from</span> on Display, <span class="hl">but I\'d push back gently on that</span>. Search is our highest-intent channel — cutting 40% right before peak would likely hurt total conversions.' },
+      { who: "client", text: "Hmm. What would you do?" },
+      { who: "you", text: '<span class="hl">What I\'d propose is</span> a 10% test shift first. We monitor Search IS and conversions for two weeks. <span class="hl">If the data tells a different story</span> than I expect, we go bigger.' },
+      { who: "client", text: "Fair enough. Let's start with 10%." },
+      { who: "you", text: '<span class="hl">Sounds good</span> — I\'ll have the budget reallocation queued up by EOD tomorrow.' }
+    ]
+  },
+  {
+    title: "Asking for Clarification",
+    scenario: "Клієнт надіслав розмите повідомлення про \"aggressive scaling\".",
+    turns: [
+      { who: "client", text: "We need to scale aggressively this month." },
+      { who: "you", text: '<span class="hl">Quick question</span> — <span class="hl">could you clarify what you mean by</span> "aggressively"? Are we thinking 50% budget increase, 2x, or scaling channels we haven\'t tested yet?' },
+      { who: "client", text: "More like 2x on Search and Shopping." },
+      { who: "you", text: '<span class="hl">Just to make sure I\'ve got this right</span> — 2x current spend, focused on Search + Shopping, channels we already know work? <span class="hl">Is there a hard deadline I should be aware of?</span>' },
+      { who: "client", text: "End of month, ideally." },
+      { who: "you", text: '<span class="hl">Got it</span>. <span class="hl">I\'ll get back to you on that by</span> tomorrow morning with a ramp-up plan.' }
+    ]
+  },
+  {
+    title: "Following Up Without Sounding Pushy",
+    scenario: "Клієнт не відповів на запит про доступ до Merchant Center три дні.",
+    turns: [
+      { who: "you", text: 'Hi Sarah! <span class="hl">Just following up on</span> the Merchant Center access — <span class="hl">no rush, just want to make sure this didn\'t slip through</span>. <span class="hl">Whenever you get a chance</span> to send the invite, that\'d be great.' },
+      { who: "client", text: "Oh sorry — totally fell off my radar. Sending now." },
+      { who: "you", text: '<span class="hl">No worries at all</span>! Got it — <span class="hl">I\'ll dive in</span> and share findings by Friday.' }
+    ]
+  },
+  {
+    title: "Closing a Performance Review Call",
+    scenario: "Кінець мітингу — треба summarise і вийти.",
+    turns: [
+      { who: "you", text: '<span class="hl">We\'re at time</span> — <span class="hl">let\'s wrap up with action items</span>. <span class="hl">Just to play it back</span>: I\'ll restructure the Search campaigns by product type, you\'ll send Q3 budget by Wednesday, and we\'ll review PMax results next Monday. <span class="hl">Sound right?</span>' },
+      { who: "client", text: "Perfect summary." },
+      { who: "you", text: '<span class="hl">Great</span> — <span class="hl">I\'ll send notes</span> over within the hour. <span class="hl">Talk soon</span>!' }
+    ]
+  },
+  {
+    title: "Owning a Mistake",
+    scenario: "Помилка з мінус-словом коштувала 1.5К зайвого витраченого бюджету.",
+    turns: [
+      { who: "you", text: 'Hi Mark — <span class="hl">I want to be upfront with you</span>: I missed adding "free" to the negative list when we restructured last week. That cost us roughly $1.5K in irrelevant clicks before I caught it.' },
+      { who: "client", text: "Okay, what's the fix?" },
+      { who: "you", text: '<span class="hl">That\'s on me</span>. The negative is added now, and I\'m doing a full sweep of all account negatives today. <span class="hl">I\'m also tightening the QA checklist</span> for restructures — <span class="hl">won\'t happen again</span>.' },
+      { who: "client", text: "Appreciate you flagging it directly." },
+      { who: "you", text: '<span class="hl">Of course</span>. <span class="hl">I\'ll send a quick post-mortem</span> by EOD with the QA changes for your visibility.' }
+    ]
+  }
+];
+
+/* ============ STATE ============ */
+const STORAGE_KEY = "client_english_progress_v1";
+let state = {
+  mode: "list",
+  category: "All",
+  search: "",
+  level: "",
+  learnedFilter: "",
+  learned: new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")),
+  flashIndex: 0,
+  flashFlipped: false,
+  quizIndex: 0,
+  quizDirection: "uk-en",
+  voiceURI: localStorage.getItem("voice_uri") || "",
+  speechRate: parseFloat(localStorage.getItem("voice_rate") || "1")
+};
+
+/* ============ SPEECH SYNTHESIS ============ */
+function loadVoices() {
+  const select = document.getElementById("voiceSelect");
+  if (!select) return;
+  const voices = speechSynthesis.getVoices().filter(v => v.lang.startsWith("en"));
+  if (voices.length === 0) { select.innerHTML = '<option>(loading…)</option>'; return; }
+  // sort: prefer en-US, en-GB, en-AU
+  const priority = (v) => {
+    if (v.lang === "en-US") return 0;
+    if (v.lang === "en-GB") return 1;
+    if (v.lang === "en-AU") return 2;
+    return 3;
+  };
+  voices.sort((a, b) => priority(a) - priority(b) || a.name.localeCompare(b.name));
+  select.innerHTML = voices.map(v => {
+    const label = `${v.name} (${v.lang})`;
+    return `<option value="${v.voiceURI}">${label}</option>`;
+  }).join("");
+  // restore saved voice
+  if (state.voiceURI && [...select.options].some(o => o.value === state.voiceURI)) {
+    select.value = state.voiceURI;
+  } else {
+    state.voiceURI = select.value;
+  }
+  // also restore rate
+  const rateSelect = document.getElementById("rateSelect");
+  if (rateSelect) rateSelect.value = state.speechRate.toString();
+}
+
+function speak(text, btn) {
+  if (!("speechSynthesis" in window)) {
+    alert("Web Speech API не підтримується в цьому браузері. Спробуй Chrome/Edge.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(x => x.voiceURI === state.voiceURI);
+  if (v) utter.voice = v;
+  else utter.lang = "en-US";
+  utter.rate = state.speechRate;
+  utter.pitch = 1;
+  if (btn) {
+    document.querySelectorAll(".speak-btn.speaking").forEach(b => b.classList.remove("speaking"));
+    btn.classList.add("speaking");
+    utter.onend = () => btn.classList.remove("speaking");
+    utter.onerror = () => btn.classList.remove("speaking");
+  }
+  speechSynthesis.speak(utter);
+}
+
+if ("speechSynthesis" in window) {
+  speechSynthesis.onvoiceschanged = loadVoices;
+  setTimeout(loadVoices, 100);
+}
+
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...state.learned]));
+  updateProgressBar();
+}
+
+function updateProgressBar() {
+  const total = PHRASES.length;
+  const learned = state.learned.size;
+  const pct = total ? Math.round((learned / total) * 100) : 0;
+  document.getElementById("learnedCount").textContent = learned;
+  document.getElementById("totalCount").textContent = total;
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressPercent").textContent = pct + "%";
+}
+
+function getCategories() {
+  const cats = ["All", ...new Set(PHRASES.map(p => p.cat))];
+  return cats;
+}
+
+function renderNav() {
+  const nav = document.getElementById("categoryNav");
+  const cats = getCategories();
+  nav.innerHTML = cats.map(c => {
+    const count = c === "All" ? PHRASES.length : PHRASES.filter(p => p.cat === c).length;
+    const learnedInCat = c === "All" ? state.learned.size : PHRASES.filter(p => p.cat === c && state.learned.has(p.id)).length;
+    const isActive = state.category === c;
+    return `<button class="${isActive ? 'active' : ''}" onclick="setCategory('${c.replace(/'/g, "\\'")}')">${c} <span class="count">${learnedInCat}/${count}</span></button>`;
+  }).join("");
+}
+
+function setCategory(c) {
+  state.category = c;
+  renderNav();
+  render();
+}
+
+function setMode(m, ev) {
+  state.mode = m;
+  document.querySelectorAll(".modes button").forEach(b => b.classList.remove("active"));
+  if (ev && ev.target) ev.target.classList.add("active");
+  render();
+}
+
+function getFiltered() {
+  const q = state.search.trim().toLowerCase();
+  return PHRASES.filter(p => {
+    if (state.category !== "All" && p.cat !== state.category) return false;
+    if (state.level && p.lvl !== state.level) return false;
+    if (state.learnedFilter === "learned" && !state.learned.has(p.id)) return false;
+    if (state.learnedFilter === "unlearned" && state.learned.has(p.id)) return false;
+    if (q) {
+      return (p.en.toLowerCase().includes(q) || p.uk.toLowerCase().includes(q) || p.ctx.toLowerCase().includes(q));
+    }
+    return true;
+  });
+}
+
+function toggleLearned(id) {
+  if (state.learned.has(id)) state.learned.delete(id);
+  else state.learned.add(id);
+  saveProgress();
+  render();
+}
+
+function levelClass(lvl) {
+  return "badge " + lvl.toLowerCase().replace("+", "plus");
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function renderList() {
+  const items = getFiltered();
+  if (items.length === 0) {
+    document.getElementById("content").innerHTML = `<div class="empty">Нічого не знайдено. Спробуй змінити фільтри.</div>`;
+    return;
+  }
+  const html = `<div class="phrase-list">${items.map(p => `
+    <div class="phrase ${state.learned.has(p.id) ? 'learned' : ''}">
+      <div class="phrase-top">
+        <div class="phrase-en">${escapeHtml(p.en)}</div>
+      </div>
+      <div class="phrase-uk">${escapeHtml(p.uk)}</div>
+      <div class="phrase-meta">
+        <span class="badge cat">${p.cat}</span>
+        <span class="${levelClass(p.lvl)}">${p.lvl}</span>
+      </div>
+      <div class="phrase-context">${escapeHtml(p.ctx)}</div>
+      <div class="phrase-example"><b>Приклад:</b> ${escapeHtml(p.ex)}</div>
+      <div class="phrase-actions">
+        <button class="speak-btn" onclick="speak(${JSON.stringify(p.en).replace(/"/g, '&quot;')}, this)">🔊 Listen</button>
+        <button class="speak-btn" onclick="speak(${JSON.stringify(p.ex).replace(/"/g, '&quot;')}, this)">🔊 Example</button>
+        <button class="icon-btn ${state.learned.has(p.id) ? 'active' : ''}" onclick="toggleLearned(${p.id})">
+          ${state.learned.has(p.id) ? '✓ Вивчено' : '○ Позначити вивченим'}
+        </button>
+      </div>
+    </div>`).join("")}</div>`;
+  document.getElementById("content").innerHTML = html;
+}
+
+function renderFlashcards() {
+  const items = getFiltered();
+  if (items.length === 0) {
+    document.getElementById("content").innerHTML = `<div class="empty">Немає карток за цими фільтрами.</div>`;
+    return;
+  }
+  if (state.flashIndex >= items.length) state.flashIndex = 0;
+  const p = items[state.flashIndex];
+  const html = `
+    <div class="flashcard-wrap">
+      <div class="flashcard-counter">${state.flashIndex + 1} / ${items.length}</div>
+      <div class="flashcard ${state.flashFlipped ? 'flipped' : ''}" onclick="flipCard()">
+        ${state.flashFlipped ? `
+          <div class="face-uk">${escapeHtml(p.uk)}</div>
+          <div class="face-context">${escapeHtml(p.ctx)}</div>
+          <div class="face-example">${escapeHtml(p.ex)}</div>
+        ` : `
+          <div class="face-en">${escapeHtml(p.en)}</div>
+          <div style="margin-top: 14px; color: var(--muted); font-size: 13px;">Натисни щоб побачити переклад</div>
+        `}
+      </div>
+      <div class="flashcard-controls">
+        <button class="icon-btn" onclick="prevCard()">← Попередня</button>
+        <button class="speak-btn" onclick="speak(${JSON.stringify(p.en).replace(/"/g, '&quot;')}, this)">🔊 Listen</button>
+        <button class="speak-btn" onclick="speak(${JSON.stringify(p.ex).replace(/"/g, '&quot;')}, this)">🔊 Example</button>
+        <button class="icon-btn ${state.learned.has(p.id) ? 'active' : ''}" onclick="toggleLearned(${p.id})">
+          ${state.learned.has(p.id) ? '✓ Вивчено' : '○ Позначити вивченим'}
+        </button>
+        <button class="icon-btn" onclick="nextCard()">Наступна →</button>
+      </div>
+      <div class="phrase-meta" style="margin-top: 8px;">
+        <span class="badge cat">${p.cat}</span>
+        <span class="${levelClass(p.lvl)}">${p.lvl}</span>
+      </div>
+    </div>`;
+  document.getElementById("content").innerHTML = html;
+}
+
+function flipCard() { state.flashFlipped = !state.flashFlipped; renderFlashcards(); }
+function nextCard() {
+  const items = getFiltered();
+  state.flashIndex = (state.flashIndex + 1) % items.length;
+  state.flashFlipped = false;
+  renderFlashcards();
+}
+function prevCard() {
+  const items = getFiltered();
+  state.flashIndex = (state.flashIndex - 1 + items.length) % items.length;
+  state.flashFlipped = false;
+  renderFlashcards();
+}
+
+function renderQuiz() {
+  const items = getFiltered();
+  if (items.length === 0) {
+    document.getElementById("content").innerHTML = `<div class="empty">Немає фраз для квізу за цими фільтрами.</div>`;
+    return;
+  }
+  if (state.quizIndex >= items.length) state.quizIndex = 0;
+  const p = items[state.quizIndex];
+  const html = `
+    <div class="quiz-card">
+      <div class="quiz-prompt-label">Переклади англійською:</div>
+      <div class="quiz-prompt">${escapeHtml(p.uk)}</div>
+      <input class="quiz-input" id="quizInput" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')checkQuiz(${p.id})" />
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <div style="margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="icon-btn" onclick="checkQuiz(${p.id})">Перевірити</button>
+        <button class="icon-btn" onclick="showQuizAnswer(${p.id})">Показати відповідь</button>
+        <button class="icon-btn" onclick="nextQuiz()">Наступна →</button>
+      </div>
+      <div style="margin-top: 12px; font-size: 12px; color: var(--muted);">
+        ${state.quizIndex + 1} / ${items.length} · <span class="${levelClass(p.lvl)}">${p.lvl}</span> · ${p.cat}
+      </div>
+    </div>`;
+  document.getElementById("content").innerHTML = html;
+  setTimeout(() => document.getElementById("quizInput")?.focus(), 50);
+}
+
+function normalize(s) {
+  return s.toLowerCase().replace(/[.,!?;:'"`-]/g, "").replace(/\s+/g, " ").trim();
+}
+
+function checkQuiz(id) {
+  const p = PHRASES.find(x => x.id === id);
+  const input = document.getElementById("quizInput").value;
+  const fb = document.getElementById("quizFeedback");
+  fb.classList.add("show");
+  if (normalize(input) === normalize(p.en)) {
+    fb.className = "quiz-feedback show correct";
+    fb.innerHTML = `✓ Правильно! Чудово. <button class="speak-btn" style="margin-left:8px" onclick="speak(${JSON.stringify(p.en).replace(/"/g, '&quot;')}, this)">🔊</button>`;
+    state.learned.add(id);
+    saveProgress();
+  } else {
+    fb.className = "quiz-feedback show incorrect";
+    fb.innerHTML = `Майже. Очікувана відповідь:<div class="answer">${escapeHtml(p.en)} <button class="speak-btn" style="margin-left:8px" onclick="speak(${JSON.stringify(p.en).replace(/"/g, '&quot;')}, this)">🔊</button></div>`;
+  }
+  speak(p.en);
+}
+
+function showQuizAnswer(id) {
+  const p = PHRASES.find(x => x.id === id);
+  const fb = document.getElementById("quizFeedback");
+  fb.className = "quiz-feedback show incorrect";
+  fb.innerHTML = `Відповідь:<div class="answer">${escapeHtml(p.en)}</div>`;
+}
+
+function nextQuiz() {
+  const items = getFiltered();
+  state.quizIndex = (state.quizIndex + 1) % items.length;
+  renderQuiz();
+}
+
+function renderDialogues() {
+  const html = DIALOGUES.map(d => `
+    <div class="dialogue">
+      <h3>${d.title}</h3>
+      <div class="scenario">${d.scenario}</div>
+      ${d.turns.map(t => `
+        <div class="turn">
+          <div class="who ${t.who === 'you' ? 'you' : ''}">${t.who === 'you' ? 'YOU' : 'CLIENT'}</div>
+          <div class="text">${t.text}</div>
+        </div>
+      `).join("")}
+    </div>
+  `).join("");
+  document.getElementById("content").innerHTML = html || `<div class="empty">No dialogues yet.</div>`;
+}
+
+function render() {
+  state.search = document.getElementById("search").value;
+  state.level = document.getElementById("levelFilter").value;
+  state.learnedFilter = document.getElementById("learnedFilter").value;
+  if (state.mode === "list") renderList();
+  else if (state.mode === "flashcards") renderFlashcards();
+  else if (state.mode === "quiz") renderQuiz();
+  else if (state.mode === "dialogues") renderDialogues();
+  renderNav();
+}
+
+function randomPhrase() {
+  const items = getFiltered();
+  if (items.length === 0) return;
+  const p = items[Math.floor(Math.random() * items.length)];
+  state.flashIndex = items.indexOf(p);
+  state.flashFlipped = false;
+  setMode("flashcards");
+  document.querySelectorAll(".modes button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".modes button")[1].classList.add("active");
+}
+
+function resetProgress() {
+  if (!confirm("Скинути весь прогрес? Цю дію не можна скасувати.")) return;
+  state.learned = new Set();
+  saveProgress();
+  render();
+}
+
+/* ============ INIT ============ */
+updateProgressBar();
+renderNav();
+render();
+</script>
+</body>
+</html>
